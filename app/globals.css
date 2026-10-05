@@ -7,8 +7,6 @@
   --px:max(96px,calc((100vw - 1248px)/2));
 }
 *{box-sizing:border-box}
-html{scroll-behavior:smooth}
-@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 body{margin:0;background:var(--cream);color:var(--charcoal);font-family:var(--sans);font-weight:400;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 h1,h2,h3,h4,p,ul,blockquote,figure{margin:0}
 ul{list-style:none;padding:0}
