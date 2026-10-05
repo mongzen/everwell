@@ -2,10 +2,10 @@
 import { useEffect, useRef, useState } from 'react';
 
 const TEAM = [
-  { name: 'Dr. Natthida Wongsuwan', focus: 'Clinical psychologist · Trauma, anxiety', bio: 'Specialized care for trauma and anxiety, with a calm, steady approach for adults who feel overwhelmed.', photo: 'photo-1.png', w: 384, offset: false, crop: { h: '106.62%', l: '-0.01%', t: '-3.26%', w: '99.96%' } },
-  { name: 'Kritsada Chaiyasit', focus: 'Counseling psychologist · Life transitions, burnout', bio: 'Down-to-earth support for adults navigating change, stress and burnout.', photo: 'photo-2.png', w: 425, offset: true },
-  { name: 'Pimchanok Srisuk', focus: 'Counseling psychologist · Teens & families', bio: 'A warm, steady space for teens and the parents who love them.', photo: 'photo-3.png', w: 425, offset: false, crop: { h: '106.54%', l: '0', t: '-0.02%', w: '99.88%' } },
-  { name: 'Siriporn Thongdee', focus: 'Counseling psychologist · Couples, life transitions', bio: 'Warm, practical support for partners and families finding their footing together.', photo: 'photo-4.png', w: 384, offset: true },
+  { name: 'Dr. Natthida Wongsuwan', focus: 'Clinical psychologist · Trauma, anxiety', bio: 'Specialized care for trauma and anxiety, with a calm, steady approach for adults who feel overwhelmed.', photo: 'img_therapist_1.webp', w: 384, offset: false },
+  { name: 'Kritsada Chaiyasit', focus: 'Counseling psychologist · Life transitions, burnout', bio: 'Down-to-earth support for adults navigating change, stress and burnout.', photo: 'img_therapist_2.webp', w: 425, offset: true },
+  { name: 'Pimchanok Srisuk', focus: 'Counseling psychologist · Teens & families', bio: 'A warm, steady space for teens and the parents who love them.', photo: 'img_therapist_3.webp', w: 425, offset: false },
+  { name: 'Siriporn Thongdee', focus: 'Counseling psychologist · Couples, life transitions', bio: 'Warm, practical support for partners and families finding their footing together.', photo: 'img_therapist_4.webp', w: 384, offset: true },
   { name: 'Thanawat Prasert', focus: 'Clinical psychologist · Depression, grief', bio: 'Steady, unhurried sessions for adults moving through loss and low mood.', w: 384, offset: false },
   { name: 'Dr. Napat Rattanakorn', focus: 'Clinical psychologist · Adolescents, anxiety', bio: 'Gentle, collaborative care for teens and the parents who support them.', w: 384, offset: true },
 ] as const;
@@ -32,9 +32,7 @@ export default function TeamSlider() {
             <div className="card">
               <div className="card__photo">
                 {'photo' in t ? (
-                  'crop' in t && t.crop
-                    ? <img className="card__crop" alt={t.name} src={`/images/${t.photo}`} style={{ height: t.crop.h, left: t.crop.l, top: t.crop.t, width: t.crop.w }} />
-                    : <img className="card__cover" alt={t.name} src={`/images/${t.photo}`} />
+                  <img className="card__cover" alt={t.name} src={`/images/${t.photo}`} width={768} height={960} />
                 ) : <span className="card__ph">Photo · 4:5 · same crop for every clinician</span>}
               </div>
               <div className="card__info">

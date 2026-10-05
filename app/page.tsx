@@ -11,9 +11,9 @@ const TRUST = [
   ['03 — Hours', 'Evenings & weekends', 'Sessions Monday–Saturday, 08:00–20:00 (Thailand time).', '/icons/trust-hours.svg'],
 ];
 const STEPS = [
-  ['01', 'Tell us a little', 'Share a few details in a short, confidential form. We reply within one business day.', 'step-1.png', null],
-  ['02', 'Get matched', 'We pair you with a qualified psychologist whose experience fits what you’re looking for.', 'step-2.png', null],
-  ['03', 'Begin when ready', 'Meet on secure video from home. There’s no pressure to have it all figured out.', 'step-3.png', { h: '107.78%', l: '-59.62%', t: '-3.89%', w: '219.66%' }],
+  ['01', 'Tell us a little', 'Share a few details in a short, confidential form. We reply within one business day.', 'img_step_1.webp'],
+  ['02', 'Get matched', 'We pair you with a qualified psychologist whose experience fits what you’re looking for.', 'img_step_2.webp'],
+  ['03', 'Begin when ready', 'Meet on secure video from home. There’s no pressure to have it all figured out.', 'img_step_3.webp'],
 ] as const;
 
 export default function Home() {
@@ -24,7 +24,7 @@ export default function Home() {
       <main id="main">
         {/* HERO */}
         <section className="hero" id="top">
-          <img className="hero__bg" src="/images/hero.png" alt="" />
+          <img className="hero__bg" src="/images/img_hero_bg.webp" width="2880" height="1800" alt="" />
           <div className="hero__glow"><FlowLines /></div>
           <div className="hero__scrim" />
           <div className="hero__inner">
@@ -59,7 +59,7 @@ export default function Home() {
         <section className="support" id="services">
           <div className="outro">
             <div className="outro__marquee" aria-hidden="true"><div className="outro__track">{Array.from({ length: 10 }, (_, i) => <span key={i}>Support</span>)}</div></div>
-            <img className="outro__img" src="/images/support-center.png" alt="" />
+            <img className="outro__img" src="/images/img_support_center.webp" width="640" height="640" alt="" />
             <div className="outro__cap"><p>Anxiety · Depression · Trauma · Couples · Grief · Life transitions</p><p className="label">8 AREAS OF CARE</p></div>
             <blockquote className="outro__quote" aria-hidden="true"><p>“Not sure what to call it? That’s okay. We’ll figure it out together, at your pace.”</p><footer className="label">/ Everwell care team</footer></blockquote>
           </div>
@@ -78,17 +78,16 @@ export default function Home() {
 
         {/* HOW IT WORKS */}
         <section className="how">
-          <img className="how__bg" src="/images/how-bg.png" alt="" />
+          <img className="how__bg" src="/images/how_it_works_frame_fill_.webp" width="2880" height="2446" alt="" />
           <div className="how__scrim" />
           <div className="how__head"><p className="label">How it works</p><h2>Getting started takes three small steps.</h2></div>
           <div className="steps">
-            {STEPS.map(([n, t, d, img, crop]) => (
+            {STEPS.map(([n, t, d, img]) => (
               <article className="step" key={n}>
                 <div className="step__top">
                   <span className="step__n">{n}</span>
                   <div className="step__visual">
-                    {crop ? <img alt="" src={`/images/${img}`} style={{ position: 'absolute', maxWidth: 'none', height: crop.h, left: crop.l, top: crop.t, width: crop.w }} />
-                      : <img alt="" src={`/images/${img}`} className="cover" />}
+                    <img alt="" src={`/images/${img}`} width={420} height={540} className="cover" />
                   </div>
                 </div>
                 <div className="step__info">

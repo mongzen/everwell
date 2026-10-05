@@ -74,14 +74,9 @@ lib/loop.ts         ← ตัวควบคุม Effect (หยุดเม�
 - ฟอนต์ (Cormorant Garamond, DM Sans) ติดมากับโปรเจกต์ ไม่ต้องโหลดจาก Google
 - มีเฉพาะหน้า Home ภาษาอังกฤษ — หน้า TH และหน้าอื่นยังไม่ได้ทำ
 
-## ขั้นตอนดึงรูปจริงจาก Figma (ทำครั้งเดียวก่อนรัน)
+## รูปภาพ
 
-รูปใน `public/images` ต้องดึงจาก Figma ด้วยคำสั่ง:
+รูปทั้งหมดอยู่ใน `public/images` เป็นไฟล์ `.webp` ที่ export จาก Figma ขนาด 2× (ตรงกับหน้า "Assets — Images" ใน Figma)
+รูปถูก crop มาจาก Figma แล้ว โค้ดจึงแสดงด้วย `object-fit: cover` ในกรอบที่ CSS กำหนดขนาดไว้ตามดีไซน์
+ถ้าจะเปลี่ยนรูป ให้ export ขนาดเดิม ×2 และใช้ชื่อไฟล์เดิม
 
-```bash
-npm install
-npm run assets   # ดาวน์โหลดรูปลง public/images (ลิงก์ Figma หมดอายุ ~7 วัน)
-npm run dev
-```
-
-ถ้าลิงก์หมดอายุ ให้ export รูปจาก Figma เองแล้ววางชื่อไฟล์ตามที่ระบุใน `scripts/fetch-assets.mjs`

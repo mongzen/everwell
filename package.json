@@ -5,8 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
-    "assets": "node scripts/fetch-assets.mjs"
+    "start": "next start"
   },
   "dependencies": {
     "@fontsource/cormorant-garamond": "^5.3.0",

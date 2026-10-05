@@ -37,7 +37,7 @@ export default function SupportList() {
         ))}
       </ul>
       <div className="slist__card" ref={card} aria-hidden="true">
-        <div className="slist__card-in"><img src="/images/support-cursor.png" alt="" /></div>
+        <div className="slist__card-in"><img src="/images/img_support_cursor.webp" width="560" height="760" alt="" /></div>
       </div>
     </div>
   );
