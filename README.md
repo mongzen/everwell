@@ -73,3 +73,15 @@ lib/loop.ts         ← ตัวควบคุม Effect (หยุดเม�
 - Effect หยุดอัตโนมัติเมื่อเลื่อนพ้นจอ และปิดแอนิเมชันถ้าผู้ใช้ตั้งค่า *reduced motion*
 - ฟอนต์ (Cormorant Garamond, DM Sans) ติดมากับโปรเจกต์ ไม่ต้องโหลดจาก Google
 - มีเฉพาะหน้า Home ภาษาอังกฤษ — หน้า TH และหน้าอื่นยังไม่ได้ทำ
+
+## ขั้นตอนดึงรูปจริงจาก Figma (ทำครั้งเดียวก่อนรัน)
+
+รูปใน `public/images` ต้องดึงจาก Figma ด้วยคำสั่ง:
+
+```bash
+npm install
+npm run assets   # ดาวน์โหลดรูปลง public/images (ลิงก์ Figma หมดอายุ ~7 วัน)
+npm run dev
+```
+
+ถ้าลิงก์หมดอายุ ให้ export รูปจาก Figma เองแล้ววางชื่อไฟล์ตามที่ระบุใน `scripts/fetch-assets.mjs`

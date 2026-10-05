@@ -5,6 +5,16 @@ import RatesReveal from '@/components/RatesReveal';
 import { FlowLines, Jellyfish, GlowField } from '@/components/Effects';
 
 const MARQUEE = ['Qualified psychologists', 'Online consultation across Thailand', 'Evenings & weekends', 'Insurance accepted', 'Begin when ready'];
+const TRUST = [
+  ['01 — Credentials', 'Qualified in Thailand', 'Every clinician holds a valid professional license in Thailand.', '/icons/trust-credentials.svg'],
+  ['02 — Coverage', 'Insurance accepted', 'We check your benefits before your first session.', '/icons/trust-coverage.svg'],
+  ['03 — Hours', 'Evenings & weekends', 'Sessions Monday–Saturday, 08:00–20:00 (Thailand time).', '/icons/trust-hours.svg'],
+];
+const STEPS = [
+  ['01', 'Tell us a little', 'Share a few details in a short, confidential form. We reply within one business day.', 'step-1.png', null],
+  ['02', 'Get matched', 'We pair you with a qualified psychologist whose experience fits what you’re looking for.', 'step-2.png', null],
+  ['03', 'Begin when ready', 'Meet on secure video from home. There’s no pressure to have it all figured out.', 'step-3.png', { h: '107.78%', l: '-59.62%', t: '-3.89%', w: '219.66%' }],
+] as const;
 
 export default function Home() {
   return (
@@ -14,67 +24,77 @@ export default function Home() {
       <main id="main">
         {/* HERO */}
         <section className="hero" id="top">
-          <FlowLines />
-          <div className="hero-copy">
-            <div className="eyebrow light">Online therapy · Qualified in Thailand</div>
-            <h1>A calmer place to begin.</h1>
-            <p>Secure online therapy with qualified Thai psychologists for adults, teens, couples and families — in Thai or English, at a pace that feels right for you.</p>
-            <div className="hero-note">New clients welcome · Private insurance accepted · Evening &amp; weekend sessions</div>
-            <div className="hero-ctas">
-              <a className="btn btn-light" href="#contact">Book a consultation</a>
-              <a className="link-light" href="#services">How it works</a>
+          <img className="hero__bg" src="/images/hero.png" alt="" />
+          <div className="hero__glow"><FlowLines /></div>
+          <div className="hero__scrim" />
+          <div className="hero__inner">
+            <div className="hero__text">
+              <p className="label hero__eyebrow">Online therapy · Qualified in Thailand</p>
+              <h1>A calmer place to begin.</h1>
+              <p className="hero__sub">Secure online therapy with qualified Thai psychologists for adults, teens, couples and families — in Thai or English, at a pace that feels right for you.</p>
+              <p className="hero__note">New clients welcome · Private insurance accepted · Evening &amp; weekend sessions</p>
+            </div>
+            <div className="hero__ctas">
+              <a className="glass btn" href="#contact"><span className="label">Book an appointment</span></a>
+              <a className="textbtn textbtn--light" href="#psychologists"><span className="label">Meet our team</span><i /></a>
             </div>
           </div>
         </section>
 
         {/* TRUST */}
         <section className="trust">
-          {[
-            ['01 — Credentials', 'Qualified in Thailand', 'Our psychologists are trained in Thailand, and clinical psychologists hold a verifiable professional licence.'],
-            ['02 — Coverage', 'Insurance accepted', 'We check your benefits before your first session.'],
-            ['03 — Hours', 'Evenings & weekends', 'Sessions Monday–Saturday, 08:00–20:00 (Thailand time).'],
-          ].map(([k, t, d]) => (
-            <div className="trust-item" key={k}>
-              <div className="trust-icon" aria-hidden="true" />
-              <div className="eyebrow">{k}</div>
-              <h3>{t}</h3>
-              <p>{d}</p>
+          {TRUST.map(([k, t, d, icon]) => (
+            <div className="trust__item" key={k}>
+              <div className="trust__icon"><img src={icon} width={36} height={36} alt="" /></div>
+              <div className="trust__text">
+                <p className="label trust__k">{k}</p>
+                <h3>{t}</h3>
+                <p>{d}</p>
+              </div>
             </div>
           ))}
         </section>
 
         {/* SUPPORT */}
         <section className="support" id="services">
-          <Jellyfish />
           <div className="outro">
-            <div className="outro-marquee" aria-hidden="true"><div className="track">{Array.from({ length: 10 }, (_, i) => <span key={i}>Support</span>)}</div></div>
-            <div className="outro-center" aria-hidden="true" />
-            <div className="outro-cap"><span>Anxiety · Depression · Trauma · Couples · Grief · Life transitions</span><span className="eyebrow">8 areas of care</span></div>
-            <blockquote>“Not sure what to call it? That’s okay. We’ll figure it out together, at your pace.”<footer className="eyebrow">/ Everwell care team</footer></blockquote>
+            <div className="outro__marquee" aria-hidden="true"><div className="outro__track">{Array.from({ length: 10 }, (_, i) => <span key={i}>Support</span>)}</div></div>
+            <img className="outro__img" src="/images/support-center.png" alt="" />
+            <div className="outro__cap"><p>Anxiety · Depression · Trauma · Couples · Grief · Life transitions</p><p className="label">8 AREAS OF CARE</p></div>
+            <blockquote className="outro__quote" aria-hidden="true"><p>“Not sure what to call it? That’s okay. We’ll figure it out together, at your pace.”</p><footer className="label">/ Everwell care team</footer></blockquote>
           </div>
-          <div className="support-body">
-            <div className="support-head">
-              <div className="eyebrow">What we support</div>
-              <h2>Support for what you’re carrying.</h2>
-              <p>Not sure what to call it? That’s okay. We’ll figure it out together, at your pace.</p>
+          <div className="slist-wrap">
+            <div className="slist-bg"><Jellyfish /></div>
+            <div className="slist-layout">
+              <div className="slist-head">
+                <p className="label slist-head__eyebrow">What we support</p>
+                <h2>Support for what you’re carrying.</h2>
+                <p className="lead">Not sure what to call it? That’s okay. We’ll figure it out together, at your pace.</p>
+              </div>
+              <SupportList />
             </div>
-            <SupportList />
           </div>
         </section>
 
         {/* HOW IT WORKS */}
         <section className="how">
-          <div className="section-head"><div className="eyebrow light">How it works</div><h2>Getting started takes three small steps.</h2></div>
+          <img className="how__bg" src="/images/how-bg.png" alt="" />
+          <div className="how__scrim" />
+          <div className="how__head"><p className="label">How it works</p><h2>Getting started takes three small steps.</h2></div>
           <div className="steps">
-            {[
-              ['01', 'Tell us a little', 'Share a few details in a short, confidential form. We reply within one business day.'],
-              ['02', 'Get matched', 'We pair you with a qualified psychologist whose experience fits what you’re looking for.'],
-              ['03', 'Begin when ready', 'Meet on secure video from home. There’s no pressure to have it all figured out.'],
-            ].map(([n, t, d], i) => (
+            {STEPS.map(([n, t, d, img, crop]) => (
               <article className="step" key={n}>
-                <div className="step-top"><span>{n}</span><div className={`step-visual v${i}`} aria-hidden="true"><i /><i /></div></div>
-                <h3>{t}</h3>
-                <div className="step-desc"><p>{d}</p><span aria-hidden="true">→</span></div>
+                <div className="step__top">
+                  <span className="step__n">{n}</span>
+                  <div className="step__visual">
+                    {crop ? <img alt="" src={`/images/${img}`} style={{ position: 'absolute', maxWidth: 'none', height: crop.h, left: crop.l, top: crop.t, width: crop.w }} />
+                      : <img alt="" src={`/images/${img}`} className="cover" />}
+                  </div>
+                </div>
+                <div className="step__info">
+                  <h3>{t}</h3>
+                  <div className="step__desc"><p>{d}</p><span aria-hidden="true">→</span></div>
+                </div>
               </article>
             ))}
           </div>
@@ -82,43 +102,50 @@ export default function Home() {
 
         {/* TEAM */}
         <section className="team" id="psychologists">
-          <div className="section-head row"><h2>Meet our therapists</h2><a className="link-dark" href="#psychologists">View full team →</a></div>
+          <div className="team__head"><h2>Meet our therapists</h2><a className="label" href="#psychologists">View full team →</a></div>
           <TeamSlider />
         </section>
 
         {/* MARQUEE */}
         <section className="marquee" aria-hidden="true">
-          <div className="track">
-            {[...MARQUEE, ...MARQUEE, ...MARQUEE].map((t, i) => <span key={i}>{t}<i /></span>)}
+          <div className="marquee__track">
+            {[0, 1].map((r) => MARQUEE.map((t, i) => <span className="marquee__item" key={`${r}-${i}`}><span>{t}</span><i /></span>))}
           </div>
         </section>
 
-        <RatesReveal />
+        {/* RATES */}
+        <section className="rates" id="fees">
+          <div className="rates__head"><p className="label">Service fees</p><h2>Clear, upfront fees.</h2></div>
+          <RatesReveal />
+          <a className="outline btn" href="#contact"><span className="label">See rates &amp; insurance</span></a>
+        </section>
 
         {/* CONTACT */}
         <section className="cta" id="contact">
-          <GlowField />
-          <div className="cta-copy">
-            <h2>Ready when you are.</h2>
-            <p>Book a free 15-minute consultation. No pressure, no commitment — just a conversation to help you find the right fit.</p>
-            <div className="cta-btns">
-              <a className="btn btn-dark" href="mailto:hello@everwell.example">Book a consultation</a>
-              <a className="btn btn-ghost" href="mailto:hello@everwell.example">Send a message</a>
-            </div>
+          <div className="cta__fx"><GlowField /></div>
+          <h2>Ready when you are.</h2>
+          <p className="lead cta__p">Book a free 15-minute consultation. No pressure, no commitment — just a conversation to help you find the right fit.</p>
+          <div className="cta__btns">
+            <a className="solid btn" href="mailto:hello@everwell.example"><span className="label">Book an appointment</span></a>
+            <a className="textbtn textbtn--dark" href="mailto:hello@everwell.example"><span className="label">Send a message</span><i /></a>
           </div>
         </section>
       </main>
 
       {/* FOOTER */}
       <footer className="footer">
-        <div className="footer-grid">
-          <div className="footer-brand"><div className="logo">Everwell</div><p>Warm, confidential online therapy with qualified psychologists in Thailand for adults, teens, couples and families.</p></div>
-          <div><h4>Menu</h4><ul><li><a href="#psychologists">Psychologists</a></li><li><a href="#fees">Service fees</a></li><li><a href="#services">Services</a></li><li><a href="#contact">Contact us</a></li></ul></div>
-          <div><h4>Contact us</h4><ul><li><a href="mailto:hello@everwell.example">hello@everwell.example</a></li><li><a href="tel:021234567">02 123 4567</a></li><li>Mon–Sat · 08:00–20:00 (ICT)</li></ul></div>
-          <div><h4>Follow</h4><ul>{['Facebook', 'Instagram', 'LINE', 'YouTube'].map((s) => <li key={s}><a href="#">{s}</a></li>)}</ul></div>
+        <div className="footer__cols">
+          <p className="footer__tagline">Warm, confidential online therapy with qualified psychologists in Thailand for adults, teens, couples and families.</p>
+          <div className="footer__links">
+            <div><h4 className="label">Menu</h4><a href="#psychologists">Psychologists</a><a href="#fees">Service fees</a><a href="#services">Services</a><a href="#contact">Contact us</a></div>
+            <div><h4 className="label">Contact us</h4><a href="mailto:hello@everwell.example">hello@everwell.example</a><a href="tel:021234567">02 123 4567</a><span>Mon–Sat · 08:00–20:00 (ICT)</span></div>
+            <div><h4 className="label">Follow</h4>{['Facebook', 'Instagram', 'LINE', 'YouTube'].map((s) => <a key={s} href="#">{s}</a>)}</div>
+          </div>
         </div>
-        <p className="crisis">If you are in crisis or need immediate help, call the Department of Mental Health hotline <a href="tel:1323">1323</a> (24 hours) or <a href="tel:1669">1669</a> for medical emergencies. Everwell is not an emergency service.</p>
-        <div className="footer-bottom"><span>© 2026 Everwell Therapy Co., Ltd. · Licence No. [to be added] · Privacy Policy · Terms of Service</span><a href="#top">Back to top ↑</a></div>
+        <p className="footer__crisis">If you are in crisis or need immediate help, call the Department of Mental Health hotline <a href="tel:1323">1323</a> (24 hours) or <a href="tel:1669">1669</a> for medical emergencies. Everwell is not an emergency service.</p>
+        <p className="footer__word" aria-hidden="true">Everwell</p>
+        <hr className="footer__rule" />
+        <div className="footer__bottom"><span>© 2026 Everwell Therapy Co., Ltd. · Licence No. [to be added] · Privacy Policy · Terms of Service</span><a className="label" href="#top">Back to top ↑</a></div>
       </footer>
     </>
   );

@@ -2,14 +2,13 @@
 import { useEffect, useRef, useState } from 'react';
 
 const TEAM = [
-  ['Dr. Natthida Wongsuwan', 'Clinical psychologist · Trauma, anxiety', 'Specialized care for trauma and anxiety, with a calm, steady approach for adults who feel overwhelmed.'],
-  ['Kritsada Chaiyasit', 'Counseling psychologist · Life transitions, burnout', 'Down-to-earth support for adults navigating change, stress and burnout.'],
-  ['Pimchanok Srisuk', 'Counseling psychologist · Teens & families', 'A warm, steady space for teens and the parents who love them.'],
-  ['Siriporn Thongdee', 'Counseling psychologist · Couples, life transitions', 'Warm, practical support for partners and families finding their footing together.'],
-  ['Thanawat Prasert', 'Clinical psychologist · Depression, grief', 'Steady, unhurried sessions for adults moving through loss and low mood.'],
-  ['Dr. Napat Rattanakorn', 'Clinical psychologist · Adolescents, anxiety', 'Gentle, collaborative care for teens and the parents who support them.'],
-];
-const TONES = ['#c9d3c6', '#d9cdb8', '#bfcabd', '#d4c6b0', '#c3cfc2', '#dccfba'];
+  { name: 'Dr. Natthida Wongsuwan', focus: 'Clinical psychologist · Trauma, anxiety', bio: 'Specialized care for trauma and anxiety, with a calm, steady approach for adults who feel overwhelmed.', photo: 'photo-1.png', w: 384, offset: false, crop: { h: '106.62%', l: '-0.01%', t: '-3.26%', w: '99.96%' } },
+  { name: 'Kritsada Chaiyasit', focus: 'Counseling psychologist · Life transitions, burnout', bio: 'Down-to-earth support for adults navigating change, stress and burnout.', photo: 'photo-2.png', w: 425, offset: true },
+  { name: 'Pimchanok Srisuk', focus: 'Counseling psychologist · Teens & families', bio: 'A warm, steady space for teens and the parents who love them.', photo: 'photo-3.png', w: 425, offset: false, crop: { h: '106.54%', l: '0', t: '-0.02%', w: '99.88%' } },
+  { name: 'Siriporn Thongdee', focus: 'Counseling psychologist · Couples, life transitions', bio: 'Warm, practical support for partners and families finding their footing together.', photo: 'photo-4.png', w: 384, offset: true },
+  { name: 'Thanawat Prasert', focus: 'Clinical psychologist · Depression, grief', bio: 'Steady, unhurried sessions for adults moving through loss and low mood.', w: 384, offset: false },
+  { name: 'Dr. Napat Rattanakorn', focus: 'Clinical psychologist · Adolescents, anxiety', bio: 'Gentle, collaborative care for teens and the parents who support them.', w: 384, offset: true },
+] as const;
 
 export default function TeamSlider() {
   const track = useRef<HTMLDivElement>(null);
@@ -28,22 +27,30 @@ export default function TeamSlider() {
   return (
     <>
       <div className="slider" ref={track} tabIndex={0} aria-label="Psychologists">
-        {TEAM.map(([name, role, blurb], i) => (
-          <article className="therapist" key={name}>
-            <div className="photo" style={{ background: `linear-gradient(160deg, ${TONES[i]}, #e8e1d2)` }} role="img" aria-label={`Portrait placeholder for ${name}`}>
-              <span>{name.replace('Dr. ', '').split(' ').map((s) => s[0]).join('')}</span>
+        {TEAM.map((t) => (
+          <article className={'slide' + (t.offset ? ' slide--offset' : '')} key={t.name} style={{ ['--w' as string]: `${t.w}px` }}>
+            <div className="card">
+              <div className="card__photo">
+                {'photo' in t ? (
+                  'crop' in t && t.crop
+                    ? <img className="card__crop" alt={t.name} src={`/images/${t.photo}`} style={{ height: t.crop.h, left: t.crop.l, top: t.crop.t, width: t.crop.w }} />
+                    : <img className="card__cover" alt={t.name} src={`/images/${t.photo}`} />
+                ) : <span className="card__ph">Photo · 4:5 · same crop for every clinician</span>}
+              </div>
+              <div className="card__info">
+                <h3>{t.name}</h3>
+                <p className="label card__focus">{t.focus}</p>
+                <p className="card__bio">{t.bio}</p>
+                <a className="label card__link" href="#contact">View profile →</a>
+              </div>
             </div>
-            <h3>{name}</h3>
-            <div className="role">{role}</div>
-            <p>{blurb}</p>
-            <a href="#contact">View profile →</a>
           </article>
         ))}
       </div>
-      <div className="slider-progress">
-        <span>Scroll to explore →</span>
-        <div className="rail"><div className="bar" style={{ width: '16%', transform: `translateX(${p * 525}%)` }} /></div>
-        <span>{String(idx).padStart(2, '0')} / {String(TEAM.length).padStart(2, '0')}</span>
+      <div className="progress">
+        <span className="label progress__hint">Scroll to explore →</span>
+        <div className="progress__rail"><div className="progress__bar" style={{ transform: `translateX(${p * 525}%)` }} /></div>
+        <span className="label progress__count">{String(idx).padStart(2, '0')} / {String(TEAM.length).padStart(2, '0')}</span>
       </div>
     </>
   );
