@@ -1,24 +1,75 @@
-# Everwell — Home (EN)
+# Everwell — หน้า Home (EN)
 
-Next.js 14 (App Router) + Three.js. Built from the Figma file "Everwell".
+เว็บคลินิกจิตบำบัดออนไลน์ ทำด้วย **Next.js 14 + Three.js** แปลงจากดีไซน์ Figma "Everwell"
 
-## Run
-    npm install
-    npm run dev        # http://localhost:3000
-    npm run build
+---
 
-## Deploy to Vercel
-Option A — CLI:  `npm i -g vercel && vercel --prod`
-Option B — push this folder to GitHub, then Vercel → Add New Project → Import (framework: Next.js, no settings to change).
+## 1. รันบนเครื่อง
 
-## Effects (components/)
-- FlowLines.tsx  — hero lines (cursor-reactive)
-- Jellyfish.tsx  — "What we support" backdrop
-- RatesReveal.tsx — pinned scroll reveal, rolling digits (THB)
-- GlowField.tsx  — contact CTA ribbons + particles
-All pause when off-screen, respect prefers-reduced-motion, and cap pixel ratio on mobile (lib/loop.ts).
+ต้องมี Node.js 18 ขึ้นไป
 
-## To finish before going live
-- Replace gradient placeholders (therapist portraits, hero/trust imagery) with real photos.
-- Fill Licence No., phone, e-mail, social links, company name (currently placeholders).
-- Therapist names and prices are fictional placeholders.
+```bash
+npm install      # ติดตั้งครั้งแรกครั้งเดียว
+npm run dev      # เปิด http://localhost:3000
+```
+
+ตรวจก่อน deploy: `npm run build`
+
+---
+
+## 2. Deploy ขึ้น Vercel
+
+**วิธีง่ายสุด (ผ่าน GitHub)**
+1. push โฟลเดอร์นี้ขึ้น GitHub
+2. เข้า vercel.com → **Add New → Project** → เลือก repo
+3. กด **Deploy** (ไม่ต้องตั้งค่าอะไร Vercel รู้เองว่าเป็น Next.js)
+
+**วิธีใช้คำสั่ง**
+```bash
+npx vercel --prod
+```
+
+---
+
+## 3. โครงสร้างไฟล์
+
+```
+app/
+  page.tsx          ← เนื้อหาทั้งหน้า (แก้ข้อความที่นี่)
+  globals.css       ← สี ฟอนต์ ระยะห่าง
+  layout.tsx        ← ชื่อเว็บ, ฟอนต์
+components/
+  FlowLines.tsx     ← Effect เส้นไหลใน Hero
+  Jellyfish.tsx     ← Effect วงแหวนในส่วน Support
+  RatesReveal.tsx   ← ตัวเลขราคาหมุนตอนเลื่อน
+  GlowField.tsx     ← Effect แสงในส่วน Contact
+  Nav.tsx, SupportList.tsx, TeamSlider.tsx
+lib/loop.ts         ← ตัวควบคุม Effect (หยุดเมื่อไม่อยู่บนจอ)
+```
+
+---
+
+## 4. แก้อะไรได้ง่ายๆ
+
+| อยากแก้ | ไปที่ |
+|---|---|
+| ข้อความ / เมนู / Footer | `app/page.tsx`, `components/Nav.tsx` |
+| ราคา | `components/RatesReveal.tsx` (ตัวแปร `RATES`) |
+| รายชื่อนักจิตวิทยา | `components/TeamSlider.tsx` (ตัวแปร `TEAM`) |
+| สีทั้งเว็บ | `app/globals.css` (บนสุด `:root`) |
+| ความเข้มของเส้น Hero | `components/FlowLines.tsx` (`uOpacity`) |
+
+---
+
+## 5. ก่อนเปิดใช้งานจริง
+
+- [ ] ใส่รูปจริงแทนภาพไล่สี (รูปนักจิตวิทยา, พื้นหลัง)
+- [ ] ใส่ **เลขที่ใบอนุญาต**, อีเมล, เบอร์โทร, ลิงก์ Social ใน Footer (ตอนนี้เป็นค่าตัวอย่าง)
+- [ ] เปลี่ยนชื่อนักจิตวิทยาและราคา (ตอนนี้เป็นข้อมูลสมมติ)
+- [ ] ตั้งชื่อบริษัทให้ตรงกับที่จดทะเบียน
+
+## หมายเหตุ
+
+- Effect หยุดอัตโนมัติเมื่อเลื่อนพ้นจอ และปิดแอนิเมชันถ้าผู้ใช้ตั้งค่า *reduced motion*
+- ฟอนต์ (Cormorant Garamond, DM Sans) ติดมากับโปรเจกต์ ไม่ต้องโหลดจาก Google
+- มีเฉพาะหน้า Home ภาษาอังกฤษ — หน้า TH และหน้าอื่นยังไม่ได้ทำ
