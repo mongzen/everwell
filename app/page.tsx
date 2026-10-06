@@ -2,7 +2,7 @@ import Nav from '@/components/Nav';
 import SupportList from '@/components/SupportList';
 import TeamSlider from '@/components/TeamSlider';
 import RatesReveal from '@/components/RatesReveal';
-import { FlowLines, Jellyfish, GlowField } from '@/components/Effects';
+import { FlowLines, Jellyfish, OrganicGradient, GlowField } from '@/components/Effects';
 
 const MARQUEE = ['Qualified psychologists', 'Online consultation across Thailand', 'Evenings & weekends', 'Insurance accepted', 'Begin when ready'];
 const TRUST = [
@@ -43,6 +43,7 @@ export default function Home() {
 
         {/* TRUST */}
         <section className="trust">
+          <div className="fx-bg"><OrganicGradient variant="trust" /></div>
           {TRUST.map(([k, t, d, icon]) => (
             <div className="trust__item" key={k}>
               <div className="trust__icon"><img src={icon} width={36} height={36} alt="" /></div>
@@ -101,6 +102,7 @@ export default function Home() {
 
         {/* TEAM */}
         <section className="team" id="psychologists">
+          <div className="fx-bg"><OrganicGradient variant="team" /></div>
           <div className="team__head"><h2>Meet our therapists</h2><a className="label" href="#psychologists">View full team →</a></div>
           <TeamSlider />
         </section>

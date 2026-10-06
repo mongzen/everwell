@@ -16,6 +16,9 @@ section[id]{scroll-margin-top:0}
 .skip{position:absolute;left:-999px;top:8px;background:var(--paper);padding:8px 14px;z-index:100}.skip:focus{left:8px}
 :focus-visible{outline:2px solid var(--clay);outline-offset:3px}
 .fx{position:absolute;inset:0;overflow:hidden;pointer-events:none}.fx canvas{width:100%;height:100%;display:block}
+.fx-bg{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.trust,.team{position:relative}
+.trust>:not(.fx-bg),.team>:not(.fx-bg):not(.team__gl){position:relative;z-index:1}
 .cover{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 
 /* type tokens */
