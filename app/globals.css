@@ -62,9 +62,9 @@ h2{line-height:.98}
 .hero h1{font-size:104px;line-height:1;letter-spacing:-1.04px;color:var(--cream)}
 .hero__sub{font:300 18px/1.8 var(--sans);color:var(--mist);width:500px;max-width:100%}
 .hero__note{font:400 13px/1.6 var(--sans);letter-spacing:.26px;color:var(--mist);width:500px;max-width:100%}
-.hero__ctas{position:absolute;left:904px;top:717px;display:flex;align-items:center;gap:24px}
+.hero__ctas{position:absolute;right:var(--px);bottom:128px;margin:0;display:flex;align-items:center;gap:24px}  /* right edge = nav__cta right edge (both inset by --px) */
 /* sound toggle — bottom-left of the hero, level with the CTAs */
-.sound{position:absolute;left:var(--px);top:724px;height:43px;padding:0 16px;display:inline-flex;align-items:center;gap:10px;border:1px solid rgba(244,239,230,.4);border-radius:21.5px;color:var(--cream);background:transparent;cursor:pointer;transition:background .25s,border-color .25s;z-index:2}
+.sound{position:absolute;left:var(--px);bottom:134px;height:43px;padding:0 16px;display:inline-flex;align-items:center;gap:10px;border:1px solid rgba(244,239,230,.4);border-radius:21.5px;color:var(--cream);background:transparent;cursor:pointer;transition:background .25s,border-color .25s;z-index:2}
 .sound:hover{background:rgba(244,239,230,.1)}
 .sound.is-on{background:rgba(244,239,230,.16)}
 .sound:focus-visible{outline:1px solid var(--cream);outline-offset:4px}
@@ -243,7 +243,6 @@ h2{line-height:.98}
   .how h2,.team__head h2,.rates h2{font-size:clamp(44px,6.667vw,96px)}
   .slist-head h2{font-size:clamp(40px,5vw,72px)}
   .footer__word{font-size:28.4vw;letter-spacing:-.04em}
-  .hero__ctas{left:min(904px,62.78vw)}
   .rate__num{font-size:clamp(72px,10.14vw,146px)}
   .outro__track{font-size:clamp(120px,20.8vw,300px)}
   .marquee__item>span{font-size:clamp(64px,8.33vw,120px)}

@@ -1,0 +1,163 @@
+/* Drift — jellyfish aquarium (Three.js) */
+.drift{position:fixed;inset:0;overflow:hidden;background:#02040c;color:var(--cream,#f4efe6);font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;touch-action:none;user-select:none}
+.drift__canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.drift__grain{position:absolute;inset:-50%;pointer-events:none;opacity:.05;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");animation:drift-grain 1.2s steps(4) infinite}
+@keyframes drift-grain{0%{transform:translate(0,0)}25%{transform:translate(-3%,2%)}50%{transform:translate(2%,-3%)}75%{transform:translate(-2%,-1%)}100%{transform:translate(0,0)}}
+.drift.is-light{cursor:none}
+.drift__fail{position:absolute;inset:auto 0 50%;text-align:center;opacity:.7}
+
+/* shared type */
+.drift__eyebrow,.drift__sub,.drift__count,.drift__hide,.drift__note,.drift__breath-sub,.drift__hint{font-size:12px;letter-spacing:.14em;text-transform:uppercase}
+.drift__btn{display:inline-flex;align-items:center;justify-content:center;padding:16px 30px;border-radius:999px;border:0;background:#eae3d6;color:#2e2b28;font:500 12px/1 'DM Sans',sans-serif;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:transform .3s,background .3s}
+.drift__btn:hover{background:#fff;transform:translateY(-1px)}
+.drift button:focus-visible{outline:1px solid #f4efe6;outline-offset:4px}
+
+/* intro */
+.drift__intro{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:20px;padding:24px;background:radial-gradient(ellipse at center,rgba(2,4,12,.25),rgba(2,4,12,.65));transition:opacity 1.6s ease,visibility 1.6s;z-index:3}
+.drift__intro.is-gone{opacity:0;visibility:hidden;pointer-events:none}
+.drift__eyebrow{color:#96dcf0;letter-spacing:.18em}
+.drift__title{font:300 clamp(96px,14vw,160px)/.9 'Cormorant Garamond',serif;margin:0}
+.drift__lead{max-width:560px;font-size:17px;line-height:1.65;opacity:.75;margin:0}
+.drift__note{opacity:.45;margin:0;text-transform:none;letter-spacing:0}
+
+/* HUD */
+.drift__hud{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity 1.2s ease .6s;z-index:2}
+.drift__hud.is-in{opacity:1}
+.drift.is-hidden .drift__hud{opacity:0}
+.drift__hud button,.drift__hud a,.drift__panel{pointer-events:auto}
+.drift__top{position:absolute;top:28px;left:48px;right:48px;display:flex;justify-content:space-between;align-items:flex-start}
+.drift__brand{font:300 36px/1 'Cormorant Garamond',serif;color:inherit;text-decoration:none}
+.drift__sub{margin:8px 0 0;opacity:.55;text-transform:none;letter-spacing:0}
+.drift-sound{height:43px;padding:0 16px;display:inline-flex;align-items:center;gap:10px;border:1px solid rgba(244,239,230,.4);border-radius:22px;background:transparent;color:inherit;font:500 12px/1 'DM Sans',sans-serif;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:background .25s}
+.drift-sound:hover{background:rgba(244,239,230,.1)}
+.drift-sound.is-on{background:rgba(244,239,230,.16)}
+.drift-sound.is-on .sound__bars i{animation:eq 1.35s ease-in-out infinite}
+.drift-sound.is-on .sound__bars i:nth-child(1){--a:6px;--b:12px;--c:8px}
+.drift-sound.is-on .sound__bars i:nth-child(2){--a:14px;--b:6px;--c:12px}
+.drift-sound.is-on .sound__bars i:nth-child(3){--a:10px;--b:14px;--c:5px}
+.drift-sound.is-on .sound__bars i:nth-child(4){--a:5px;--b:9px;--c:13px}
+.drift__bottom{position:absolute;left:48px;right:48px;bottom:44px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.drift__count{margin:0;opacity:.5}
+.drift__hide{background:none;border:0;color:inherit;opacity:.5;cursor:pointer;font-family:inherit;padding:8px 0}
+.drift__hide:hover{opacity:.9}
+.drift__modes{position:absolute;left:50%;transform:translateX(-50%);display:flex;gap:4px;padding:6px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px)}
+.drift__modes button{white-space:nowrap;padding:10px 18px;border-radius:999px;border:0;background:transparent;color:inherit;opacity:.6;font:500 11px/1 'DM Sans',sans-serif;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:background .3s,color .3s,opacity .3s}
+.drift__modes button:hover{opacity:1}
+.drift__modes button.is-on{background:#eae3d6;color:#2e2b28;opacity:1}
+.drift__hint{position:absolute;left:0;right:0;bottom:120px;text-align:center;opacity:.6;margin:0;text-transform:none;letter-spacing:0;font-size:13px}
+.drift__show{position:absolute;left:0;right:0;bottom:32px;text-align:center;font-size:12px;opacity:.35;margin:0;z-index:2;animation:drift-fadeout 4s forwards}
+@keyframes drift-fadeout{0%,60%{opacity:.35}100%{opacity:0}}
+
+/* breathe */
+.drift__breath{position:absolute;left:50%;top:50%;width:320px;height:320px;transform:translate(-50%,-55%);display:flex;flex-direction:column;align-items:center;justify-content:center;animation:drift-in 1.2s ease both}
+.drift__ring{position:absolute;left:50%;top:50%;width:320px;height:320px;border-radius:50%;border:1px solid rgba(244,239,230,.18);transform:translate(-50%,-50%)}
+.drift__ring--b{width:300px;height:300px;border:1.5px solid rgba(244,239,230,.55);background:rgba(150,220,240,.05);box-shadow:0 0 30px rgba(150,230,255,.35),inset 0 0 40px rgba(150,230,255,.12)}
+.drift__breath-label{position:relative;font:300 48px/1 'Cormorant Garamond',serif;margin:0}
+.drift__breath-sub{margin:0}
+@keyframes drift-in{from{opacity:0}to{opacity:1}}
+
+/* add panel */
+.drift__panel{position:absolute;right:48px;top:110px;width:380px;max-height:calc(100% - 230px);overflow:auto;padding:28px 24px;border-radius:28px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);display:flex;flex-direction:column;gap:14px;animation:drift-in .6s ease both}
+.drift__panel-head{display:flex;justify-content:space-between;align-items:center}
+.drift__panel h2{font:300 30px/1 'Cormorant Garamond',serif;margin:0}
+.drift__close{background:none;border:0;color:inherit;opacity:.6;font:500 12px 'DM Sans',sans-serif;letter-spacing:.12em;text-transform:uppercase;cursor:pointer}
+.drift__sp{display:flex;gap:14px;align-items:center;padding:12px 14px 12px 12px;border-radius:18px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:inherit;text-align:left;cursor:pointer;transition:background .3s,border-color .3s}
+.drift__sp:hover{background:rgba(255,255,255,.08)}
+.drift__sp.is-sel{background:rgba(255,255,255,.12);border-color:rgba(150,220,240,.6)}
+.drift__sp-pv{flex:none;width:64px;height:64px;border-radius:14px;background:#040c1c;display:grid;place-items:center;box-shadow:inset 0 0 24px color-mix(in srgb,var(--c) 25%,transparent)}
+.drift__sp-pv svg{width:40px;height:52px;filter:drop-shadow(0 0 6px var(--c))}
+.drift__sp-txt{display:flex;flex-direction:column;gap:3px;font-size:12px;line-height:1.45;opacity:.95}
+.drift__sp-txt strong{font-weight:500;font-size:15px}
+.drift__sp-txt span{opacity:.6}
+.drift__size{display:flex;flex-direction:column;gap:10px;margin-top:4px}
+.drift__size-row{display:flex;justify-content:space-between;font-size:12px;letter-spacing:.12em;text-transform:uppercase;opacity:.7}
+.drift__size input{width:100%;accent-color:#96dcf0}
+.drift__panel .drift__btn{margin-top:6px}
+
+/* mobile */
+@media (max-width:760px){
+  .drift__top{top:22px;left:24px;right:24px}
+  .drift__brand{font-size:28px}
+  .drift__bottom{left:24px;right:24px;bottom:36px}
+  .drift__count,.drift__hide{display:none}
+  .drift__modes button{padding:10px 11px;font-size:10px;letter-spacing:.08em}
+  .drift__panel{left:16px;right:16px;top:auto;bottom:110px;width:auto;max-height:60vh}
+  .drift__breath{transform:translate(-50%,-55%) scale(.8)}
+  .drift__hint{bottom:110px}
+}
+@media (prefers-reduced-motion:reduce){.drift__grain{animation:none}}
+
+/* music picker */
+.drift__audio{position:relative;display:flex;gap:8px;align-items:center}
+.drift__track{height:43px;padding:0 16px;border-radius:22px;border:1px solid rgba(244,239,230,.18);background:rgba(255,255,255,.04);color:inherit;font:400 13px/1 'DM Sans',sans-serif;cursor:pointer;opacity:.8}
+.drift__track::after{content:'';display:inline-block;width:6px;height:6px;margin-left:10px;border-right:1px solid currentColor;border-bottom:1px solid currentColor;transform:translateY(-3px) rotate(45deg)}
+.drift__track:hover{opacity:1}
+.drift__tracks{position:absolute;right:0;top:54px;width:320px;margin:0;padding:8px;list-style:none;border-radius:20px;background:rgba(10,18,34,.72);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);pointer-events:auto;animation:drift-in .3s ease both}
+.drift__tracks button{width:100%;display:flex;flex-direction:column;gap:3px;padding:10px 12px;border-radius:12px;border:0;background:transparent;color:inherit;text-align:left;cursor:pointer}
+.drift__tracks button:hover{background:rgba(255,255,255,.06)}
+.drift__tracks button.is-sel{background:rgba(150,220,240,.14)}
+.drift__tracks strong{font-weight:500;font-size:14px}
+.drift__tracks span{font-size:12px;opacity:.6;line-height:1.4}
+.drift__tracks-note{padding:8px 12px 4px;font-size:11px;opacity:.45}
+
+/* breathing */
+.drift__breath-count{position:relative;margin:10px 0 0;font:300 22px/1 'Cormorant Garamond',serif;opacity:.6}
+.drift__breath-foot{position:absolute;top:calc(100% + 28px);display:flex;flex-direction:column;align-items:center;gap:14px;width:min(520px,90vw)}
+.drift__patterns{display:flex;gap:6px;padding:5px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);pointer-events:auto}
+.drift__patterns button{padding:9px 14px;border-radius:999px;border:0;background:transparent;color:inherit;opacity:.65;font:500 11px/1 'DM Sans',sans-serif;letter-spacing:.06em;cursor:pointer;white-space:nowrap}
+.drift__patterns button.is-on{background:#eae3d6;color:#2e2b28;opacity:1}
+.drift__breath-foot .drift__breath-sub{position:static;white-space:normal;text-align:center;text-transform:none;letter-spacing:0;font-size:12px;line-height:1.6;opacity:.55}
+@media (max-width:760px){
+  .drift__track{display:none}
+  .drift__patterns button{padding:8px 10px;font-size:10px}
+  .drift__tracks{width:min(320px,calc(100vw - 48px))}
+}
+
+/* touching a jellyfish */
+.drift.is-touch{cursor:pointer}
+.drift.is-light.is-touch{cursor:pointer}
+.drift__ripple{position:absolute;z-index:1;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;pointer-events:none;border:1px solid var(--c);box-shadow:0 0 18px var(--c);animation:drift-ripple 1.4s cubic-bezier(.2,.7,.3,1) forwards}
+.drift__ripple::after{content:'';position:absolute;inset:-1px;border-radius:50%;border:1px solid var(--c);animation:drift-ripple2 1.4s cubic-bezier(.2,.7,.3,1) .12s forwards;opacity:0}
+@keyframes drift-ripple{0%{transform:scale(.4);opacity:.9}100%{transform:scale(7);opacity:0}}
+@keyframes drift-ripple2{0%{transform:scale(1);opacity:.6}100%{transform:scale(2.2);opacity:0}}
+.drift__hint--soft{animation:drift-hint 9s ease both}
+@keyframes drift-hint{0%{opacity:0}15%,75%{opacity:.6}100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.drift__ripple,.drift__ripple::after{animation-duration:.6s}}
+
+/* ---------- playful, jelly-like buttons ---------- */
+@keyframes jelly{0%{transform:scale(1,1)}28%{transform:scale(1.13,.87)}44%{transform:scale(.9,1.1)}60%{transform:scale(1.05,.95)}76%{transform:scale(.98,1.02)}100%{transform:scale(1,1)}}
+@keyframes jelly-soft{0%,100%{transform:scale(1,1)}35%{transform:scale(1.05,.95)}65%{transform:scale(.98,1.02)}}
+@keyframes jelly-bub{0%{transform:translate(-50%,-50%) scale(.3);opacity:0}20%{opacity:.9}100%{transform:translate(calc(-50% + var(--x)),-38px) scale(1);opacity:0}}
+.jelly-btn{position:relative;transform-origin:50% 60%;transition:transform .12s ease,background .3s,color .3s,opacity .3s;-webkit-tap-highlight-color:transparent}
+.jelly-btn:hover{animation:jelly-soft .55s ease}
+.jelly-btn:active{transform:scale(1.08,.84);transition-duration:.06s;animation:none}
+.jelly-btn.is-pop{animation:jelly .62s cubic-bezier(.3,.7,.4,1)}
+.jelly-bub{position:absolute;width:var(--s);height:var(--s);border-radius:50%;pointer-events:none;border:1px solid rgba(190,240,255,.8);background:radial-gradient(circle at 35% 35%,rgba(255,255,255,.9),rgba(150,220,240,.25) 60%,transparent 70%);animation:jelly-bub .85s ease-out var(--d) both}
+
+/* mode bar: a soft blob slides under the active mode with an elastic overshoot, then wobbles */
+.drift__modes{position:absolute}
+.drift__modes button{position:relative;z-index:1;overflow:visible}
+.drift__modes button.is-on{background:transparent;color:#2e2b28}
+.drift__blob{position:absolute;left:0;top:6px;bottom:6px;pointer-events:none;
+  transition:transform .6s cubic-bezier(.34,1.56,.64,1),width .6s cubic-bezier(.34,1.56,.64,1)}
+.drift__blob i{position:absolute;inset:0;border-radius:999px;background:#eae3d6;box-shadow:0 0 24px rgba(234,227,214,.25),inset 0 -2px 6px rgba(46,43,40,.08);animation:jelly .7s .28s cubic-bezier(.3,.7,.4,1) both}
+
+/* track button + list */
+.drift__track{transition:transform .12s ease,opacity .3s,background .3s}
+.drift__track:hover{background:rgba(255,255,255,.08)}
+.drift__track::after{transition:transform .5s cubic-bezier(.34,1.56,.64,1)}
+.drift__track[aria-expanded="true"]::after{transform:translateY(1px) rotate(-135deg)}
+.drift__tracks{transform-origin:85% 0;animation:tracks-in .5s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes tracks-in{from{opacity:0;transform:translateY(-8px) scale(.92,.86)}to{opacity:1;transform:none}}
+.drift__tracks li{animation:track-li .55s cubic-bezier(.34,1.56,.64,1) both;animation-delay:calc(var(--i,0) * 45ms + 80ms)}
+@keyframes track-li{from{opacity:0;transform:translateY(10px) scale(.94)}to{opacity:1;transform:none}}
+.drift__tracks button{overflow:visible;transition:transform .35s cubic-bezier(.34,1.56,.64,1),background .25s}
+.drift__tracks button:hover{transform:translateX(4px);animation:none}
+.drift__tracks button.is-sel strong::before{content:'';display:inline-block;width:7px;height:7px;margin-right:8px;border-radius:50%;background:#96dcf0;box-shadow:0 0 10px #96dcf0;vertical-align:1px;animation:sel-pulse 2.2s ease-in-out infinite}
+@keyframes sel-pulse{0%,100%{transform:scale(1,1);opacity:.85}40%{transform:scale(1.35,.8);opacity:1}60%{transform:scale(.85,1.2)}}
+
+@media (prefers-reduced-motion:reduce){
+  .jelly-btn,.jelly-btn:hover,.jelly-btn.is-pop,.drift__blob i,.drift__tracks,.drift__tracks li,.drift__tracks button.is-sel strong::before{animation:none!important}
+  .jelly-bub{display:none}
+  .drift__blob{transition:none}
+}

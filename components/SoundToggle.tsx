@@ -4,19 +4,20 @@ import { useEffect, useRef, useState } from 'react';
 /**
  * Hero sound toggle — plays/pauses the ambient track with a soft fade.
  * Uses Web Audio so the loop is gapless (an <audio loop> leaves a small gap with mp3).
- * Starts off: browsers block autoplay until the visitor interacts.
+ * Defaults to on. Browsers block audio until the visitor interacts, so playback is armed on load and the
+ * context is resumed on the first click / key / touch (the UI already shows "Sound on").
  */
 const SRC = '/audio/ambient.mp3';
 const VOLUME = 0.22;       // quiet background level (0–1)
 const FADE_IN = 2.5, FADE_OUT = 3.5;   // seconds — slow, soft fade in/out
 
 export default function SoundToggle() {
-  const [on, setOn] = useState(false);
+  const [on, setOn] = useState(true);
   const ctx = useRef<AudioContext | null>(null);
   const gain = useRef<GainNode | null>(null);
   const buf = useRef<AudioBuffer | null>(null);
   const src = useRef<AudioBufferSourceNode | null>(null);
-  const wanted = useRef(false);
+  const wanted = useRef(true);
   const busy = useRef(false);
 
   // Smooth exponential-style fade (setTargetAtTime): starts gently and settles, no abrupt cut.
@@ -33,7 +34,7 @@ export default function SoundToggle() {
       gain.current = ctx.current.createGain(); gain.current.gain.value = 0; gain.current.connect(ctx.current.destination);
     }
     const c = ctx.current;
-    if (c.state === 'suspended') await c.resume();
+    if (c.state === 'suspended') c.resume().catch(() => {});   // stays pending until the visitor interacts
     if (!buf.current) buf.current = await c.decodeAudioData(await (await fetch(SRC)).arrayBuffer());
     if (!src.current) {
       const s = c.createBufferSource(); s.buffer = buf.current; s.loop = true; s.connect(gain.current!); s.start(); src.current = s;
@@ -53,6 +54,26 @@ export default function SoundToggle() {
     }
   };
 
+  // Autoplay on load; if the browser blocks it, resume on the first gesture.
+  useEffect(() => {
+    wanted.current = true; setOn(true);
+    const events = ['pointerdown', 'keydown', 'touchend'] as const;
+    const unlock = () => {
+      const c = ctx.current; if (!c || !wanted.current) return;
+      c.resume().then(() => {
+        if (c.state === 'running') { events.forEach((e) => window.removeEventListener(e, unlock)); ramp(VOLUME, FADE_IN); }
+      }).catch(() => {});
+    };
+    events.forEach((e) => window.addEventListener(e, unlock, { passive: true }));
+    busy.current = true;
+    start().catch(() => {}).finally(() => { busy.current = false; });
+    return () => {
+      events.forEach((e) => window.removeEventListener(e, unlock));
+      try { src.current?.stop(); } catch {}
+      ctx.current?.close(); ctx.current = null; gain.current = null; src.current = null;
+    };
+  }, []);
+
   // mute while the tab is hidden, pick up again when it returns
   useEffect(() => {
     const vis = () => {
@@ -60,7 +81,7 @@ export default function SoundToggle() {
       if (document.hidden) c.suspend(); else c.resume().then(() => ramp(VOLUME, 1));
     };
     document.addEventListener('visibilitychange', vis);
-    return () => { document.removeEventListener('visibilitychange', vis); try { src.current?.stop(); } catch {} ctx.current?.close(); };
+    return () => document.removeEventListener('visibilitychange', vis);
   }, []);
 
   return (

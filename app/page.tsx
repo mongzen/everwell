@@ -4,9 +4,9 @@ import SupportList from '@/components/SupportList';
 import SupportOutro from '@/components/SupportOutro';
 import TeamSlider from '@/components/TeamSlider';
 import RatesReveal from '@/components/RatesReveal';
+import BreatheInvite from '@/components/BreatheInvite';
 import { FlowLines, Jellyfish, OrganicGradient, GlowField } from '@/components/Effects';
 
-const MARQUEE = ['Qualified psychologists', 'Online consultation across Thailand', 'Evenings & weekends', 'Insurance accepted', 'Begin when ready'];
 const TRUST = [
   ['01 — Credentials', 'Qualified in Thailand', 'Every clinician holds a valid professional license in Thailand.', '/icons/trust-credentials.svg'],
   ['02 — Coverage', 'Insurance accepted', 'We check your benefits before your first session.', '/icons/trust-coverage.svg'],
@@ -105,19 +105,15 @@ export default function Home() {
           <TeamSlider />
         </section>
 
-        {/* MARQUEE */}
-        <section className="marquee" aria-hidden="true">
-          <div className="marquee__track">
-            {[0, 1].map((r) => MARQUEE.map((t, i) => <span className="marquee__item" key={`${r}-${i}`}><span>{t}</span><i /></span>))}
-          </div>
-        </section>
-
         {/* RATES */}
         <section className="rates" id="fees">
           <div className="rates__head"><p className="label">Service fees</p><h2>Clear, upfront fees.</h2></div>
           <RatesReveal />
           <a className="outline btn" href="#contact"><span className="label">See rates &amp; insurance</span></a>
         </section>
+
+        {/* PAUSE — Drift invite */}
+        <BreatheInvite />
 
         {/* CONTACT */}
         <section className="cta" id="contact">
