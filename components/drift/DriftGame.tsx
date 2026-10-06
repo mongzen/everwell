@@ -29,7 +29,7 @@ function useDriftSound() {
   const buffers = useRef(new Map<string, AudioBuffer>());
   const data = useRef<Float32Array | null>(null);
   const [on, setOn] = useState(false);
-  const [track, setTrack] = useState<TrackId>('tezhnia');
+  const [track, setTrack] = useState<TrackId>('deep-water');
 
   const ramp = (p: AudioParam, to: number, sec: number) => {
     const c = ctx.current!;
@@ -349,15 +349,13 @@ export default function DriftGame() {
         <header className="drift__top">
           <div>
             <a href="/" className="drift__brand">Drift</a>
-            <p className="drift__sub">A quiet aquarium</p>
           </div>
           <div className="drift__audio">
-            <button type="button" className="drift__track jelly-btn" onPointerDown={pop} onClick={() => setMenu((v) => !v)} aria-expanded={menu} aria-haspopup="listbox">
-              {TRACKS.find((t) => t.id === sound.track)!.name}
-            </button>
             <button type="button" className={'drift-sound' + (sound.on ? ' is-on' : '')} onClick={sound.toggle} aria-pressed={sound.on}>
               <span className="sound__bars" aria-hidden="true"><i /><i /><i /><i /></span>
-              <span>{sound.on ? 'Sound on' : 'Sound off'}</span>
+            </button>
+            <button type="button" className="drift__track jelly-btn" onPointerDown={pop} onClick={() => setMenu((v) => !v)} aria-expanded={menu} aria-haspopup="listbox">
+              {TRACKS.find((t) => t.id === sound.track)!.name}
             </button>
             {menu && (
               <ul className="drift__tracks" role="listbox" aria-label="Music">

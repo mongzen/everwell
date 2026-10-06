@@ -870,11 +870,13 @@ export class Aquarium {
       return true;
     });
 
-    // slow light swell: music level + (in Breathe) brighter on the in-breath. Smoothed so it never flickers.
-    const target = Math.min(1, this.audioLevel * 1.4) * 0.7 + breathLight * 0.5;
-    this.pulse += (target - this.pulse) * Math.min(1, dt * 1.2);
+    // Keep the tank luminance stable. Audio-reactive brightness changes can feel like
+    // flicker even after smoothing, so only the deliberately slow breathing guide
+    // is allowed a very subtle swell.
+    const target = breathLight * 0.12;
+    this.pulse += (target - this.pulse) * Math.min(1, dt * 0.65);
     this.bg.material.uniforms.uPulse.value = this.pulse;
-    this.bloom.strength = (this.reduced ? 0.4 : 0.65) + this.pulse * 0.25;
+    this.bloom.strength = this.reduced ? 0.4 : 0.65;
     const ctx = { mode: this.mode, pulse: this.pulse, breathC, bounds: this.bounds, light: lightOn ? this.light : null, plankton: centers };
     // personal space: neighbours drift apart instead of piling up
     for (let i = 0; i < this.jellies.length; i++) for (let k = i + 1; k < this.jellies.length; k++) {
