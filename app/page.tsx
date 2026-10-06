@@ -1,4 +1,5 @@
 import Nav from '@/components/Nav';
+import SoundToggle from '@/components/SoundToggle';
 import SupportList from '@/components/SupportList';
 import SupportOutro from '@/components/SupportOutro';
 import TeamSlider from '@/components/TeamSlider';
@@ -39,6 +40,7 @@ export default function Home() {
               <a className="glass btn" href="#contact"><span className="label">Book an appointment</span></a>
               <a className="textbtn textbtn--light" href="#psychologists"><span className="label">Meet our team</span><i /></a>
             </div>
+            <SoundToggle />
           </div>
         </section>
 
