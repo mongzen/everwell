@@ -56,7 +56,7 @@ h2{line-height:.98}
   background:radial-gradient(ellipse 900px 643px at 1080px -129px,rgba(122,92,70,.18),rgba(122,92,70,0)),
              radial-gradient(ellipse 800px 500px at -80px 700px,rgba(59,83,66,.27),rgba(59,83,66,0))}
 .hero__scrim{position:absolute;inset:0;opacity:.45;background:linear-gradient(235.01deg,rgba(46,58,49,.25) 23.667%,rgba(46,58,49,.5) 66.413%)}
-.hero__inner{position:relative;max-width:1440px;height:100%;margin:0 auto;padding:96px var(--px) 128px;display:flex;align-items:center}
+.hero__inner{position:relative;height:100%;margin:0 auto;padding:96px var(--px) 128px;display:flex;align-items:center}
 .hero__text{display:flex;flex-direction:column;gap:32px;align-items:flex-start;justify-content:center;flex:1;min-width:1px}
 .hero__eyebrow{color:var(--mist)}
 .hero h1{font-size:104px;line-height:1;letter-spacing:-1.04px;color:var(--cream)}
