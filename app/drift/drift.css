@@ -161,3 +161,13 @@
   .jelly-bub{display:none}
   .drift__blob{transition:none}
 }
+
+/* tank capacity */
+.drift__cap{display:flex;flex-direction:column;gap:8px;font-size:12px;opacity:.7}
+.drift__cap-bar{display:block;height:3px;border-radius:2px;background:rgba(255,255,255,.12);overflow:hidden}
+.drift__cap-bar i{display:block;height:100%;border-radius:2px;background:#96dcf0;box-shadow:0 0 8px #96dcf0;transition:width .6s cubic-bezier(.34,1.56,.64,1)}
+.drift__btn.is-full,.drift__btn:disabled{background:rgba(255,255,255,.1);color:rgba(244,239,230,.7);cursor:default;transform:none;animation:none;text-transform:none;letter-spacing:0;font-size:13px}
+
+/* intro title drawn in WebGL (keeps the DOM text for layout + screen readers) */
+.drift__title.is-gl{color:transparent}
+.drift__intro{background:radial-gradient(ellipse at center,rgba(2,4,12,.1),rgba(2,4,12,.55))}

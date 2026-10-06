@@ -3,6 +3,7 @@ import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 
 /* ------------------------------------------------------------------ */
 /*  Drift — jellyfish aquarium engine                                  */
@@ -195,6 +196,82 @@ const ORB_FRAG = /* glsl */ `
   }
 `;
 
+/* ------------------------- title + glass lens ---------------------- */
+
+// The intro title "Drift" is drawn into a texture and rendered in the scene, gently wobbling like liquid.
+const TITLE_VERT = /* glsl */ `
+  uniform float uTime;
+  varying vec2 vUv;
+  void main(){
+    vUv = uv;
+    vec3 p = position;
+    p.z += (sin(p.x * 2.1 + uTime * 1.4) + sin(p.y * 3.3 - uTime * 1.1)) * 0.06;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
+  }
+`;
+const TITLE_FRAG = /* glsl */ `
+  uniform sampler2D uMap;
+  uniform float uTime;
+  uniform float uFade;
+  varying vec2 vUv;
+  void main(){
+    vec2 uv = vUv;
+    uv.x += sin(uv.y * 9.0 + uTime * 1.4) * 0.0035;
+    uv.y += sin(uv.x * 7.0 - uTime * 1.1) * 0.004;
+    float a = texture2D(uMap, uv).a;
+    vec3 col = mix(vec3(0.86, 0.93, 1.0), vec3(0.96, 0.94, 0.9), uv.y);
+    gl_FragColor = vec4(col * a * uFade * 0.92, a * uFade);
+  }
+`;
+
+// Full-screen glass lens (post-process): a refracting sphere that follows the pointer,
+// magnifies what is behind it and splits the colours at its rim (chromatic aberration).
+const LENS_SHADER = {
+  uniforms: {
+    tDiffuse: { value: null as THREE.Texture | null },
+    uMouse: { value: new THREE.Vector2(0.5, 0.5) },
+    uAspect: { value: 1 },
+    uR: { value: 0.16 },
+    uOn: { value: 0 },
+    uTime: { value: 0 },
+  },
+  vertexShader: BG_VERT,
+  fragmentShader: /* glsl */ `
+    uniform sampler2D tDiffuse;
+    uniform vec2 uMouse;
+    uniform float uAspect, uR, uOn, uTime;
+    varying vec2 vUv;
+    void main(){
+      vec4 base = texture2D(tDiffuse, vUv);
+      vec2 d = vUv - uMouse; d.x *= uAspect;
+      float dist = length(d);
+      float r = uR * (1.0 + 0.015 * sin(uTime * 1.3));
+      if (uOn < 0.001 || dist > r * 1.25) { gl_FragColor = base; return; }
+      float k = clamp(dist / r, 0.0, 1.0);
+      float z = sqrt(max(1.0 - k * k, 0.0));                  // sphere height
+      vec2 dir = d / max(dist, 1e-4);
+      // magnify toward the centre, bend strongly near the rim
+      vec2 local = d * mix(0.55, 1.0, k * k) - dir * (1.0 - z) * r * 0.25;
+      float ca = 0.007 * k * k;                               // chromatic split grows at the edge
+      vec2 toUv = vec2(1.0 / uAspect, 1.0);
+      vec3 col;
+      col.r = texture2D(tDiffuse, uMouse + (local - dir * ca) * toUv).r;
+      col.g = texture2D(tDiffuse, uMouse + local * toUv).g;
+      col.b = texture2D(tDiffuse, uMouse + (local + dir * ca) * toUv).b;
+      // glass: soft fresnel rim, a specular highlight, faint inner shade
+      float rim = smoothstep(0.78, 1.0, k);
+      col += vec3(0.75, 0.9, 1.0) * rim * 0.16;
+      col += vec3(1.0) * exp(-length(d / r - vec2(-0.38, 0.42)) * 7.0) * 0.32;
+      col *= 1.0 - smoothstep(0.96, 1.0, k) * 0.25;
+      float inside = 1.0 - smoothstep(r * 0.985, r * 1.0, dist);
+      // thin outer halo so the lens edge reads against the dark water
+      float halo = smoothstep(r * 1.06, r, dist) * (1.0 - inside) * 0.12;
+      vec3 outc = mix(base.rgb, col, inside) + vec3(0.7, 0.88, 1.0) * halo;
+      gl_FragColor = vec4(mix(base.rgb, outc, uOn), 1.0);
+    }
+  `,
+};
+
 /* ---------------------------- jellyfish --------------------------- */
 
 const TENTACLES = 24;
@@ -226,6 +303,8 @@ class Jelly {
   dying = false;
   bellMat: THREE.ShaderMaterial;
   innerMat: THREE.ShaderMaterial;
+  // level of detail: small (usually distant) jellies get fewer, shorter-simulated tentacles
+  nT: number; nS: number; iters: number;
   tPos: Float32Array; tPrev: Float32Array; tLen: number[] = [];
   aPos: Float32Array; aPrev: Float32Array; aLen: number;
   tGeo = new THREE.BufferGeometry();
@@ -236,6 +315,10 @@ class Jelly {
   constructor(public scene: THREE.Scene, species: Species, R: number, pos: THREE.Vector3) {
     const sp = SPECIES[species];
     this.R = R;
+    const small = R < 1.1;
+    this.nT = small ? 14 : TENTACLES;
+    this.nS = small ? 20 : T_SEG;
+    this.iters = small ? 2 : 3;
     this.color = new THREE.Color(sp.color);
     this.period = sp.tempo * rand(6.5, 8.5);
     this.group.position.copy(pos);
@@ -258,10 +341,10 @@ class Jelly {
     scene.add(this.group);
 
     // tentacles (world-space verlet chains)
-    this.tPos = new Float32Array(TENTACLES * T_SEG * 3);
-    this.tPrev = new Float32Array(TENTACLES * T_SEG * 3);
-    for (let i = 0; i < TENTACLES; i++) this.tLen.push(R * rand(5, 9) / (T_SEG - 1));
-    const segs = TENTACLES * (T_SEG - 1) * 2;
+    this.tPos = new Float32Array(this.nT * this.nS * 3);
+    this.tPrev = new Float32Array(this.nT * this.nS * 3);
+    for (let i = 0; i < this.nT; i++) this.tLen.push(R * rand(5, 9) / (this.nS - 1));
+    const segs = this.nT * (this.nS - 1) * 2;
     this.tGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(segs * 3), 3));
     this.tGeo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(segs * 3), 3));
     this.lines = new THREE.LineSegments(this.tGeo, new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));
@@ -287,10 +370,10 @@ class Jelly {
 
     this.group.updateMatrixWorld();
     const tmp = new THREE.Vector3();
-    for (let i = 0; i < TENTACLES; i++) {
+    for (let i = 0; i < this.nT; i++) {
       this.anchorT(i, tmp);
-      for (let j = 0; j < T_SEG; j++) {
-        const k = (i * T_SEG + j) * 3;
+      for (let j = 0; j < this.nS; j++) {
+        const k = (i * this.nS + j) * 3;
         this.tPos[k] = this.tPrev[k] = tmp.x; this.tPos[k + 1] = this.tPrev[k + 1] = tmp.y - j * this.tLen[i]; this.tPos[k + 2] = this.tPrev[k + 2] = tmp.z;
       }
     }
@@ -304,7 +387,7 @@ class Jelly {
   }
 
   private anchorT(i: number, out: THREE.Vector3) {
-    const a = (i / TENTACLES) * Math.PI * 2;
+    const a = (i / this.nT) * Math.PI * 2;
     const r = 0.97 * (1 - this.c * 0.26 + this.flare * 0.09);
     const y = -0.157 * 0.68 * (1 + this.c * 0.2) - this.c * 0.1 + this.flare * 0.03;
     out.set(Math.cos(a) * r, y, Math.sin(a) * r).applyMatrix4(this.group.matrixWorld);
@@ -402,11 +485,11 @@ class Jelly {
     const damp = Math.pow(0.975, f);
     const g = -0.0005 * this.R * f * f;
     // tentacles
-    for (let i = 0; i < TENTACLES; i++) {
+    for (let i = 0; i < this.nT; i++) {
       this.anchorT(i, tmp);
-      const base = i * T_SEG * 3;
+      const base = i * this.nS * 3;
       this.tPos[base] = tmp.x; this.tPos[base + 1] = tmp.y; this.tPos[base + 2] = tmp.z;
-      for (let j = 1; j < T_SEG; j++) {
+      for (let j = 1; j < this.nS; j++) {
         const k = base + j * 3;
         const sway = (Math.sin(t * 0.35 + i * 0.7 + j * 0.25 + this.seed) + 0.5 * Math.sin(t * 0.6 + j * 0.4 + i)) * 0.0009 * this.R * f;
         for (let a = 0; a < 3; a++) {
@@ -415,7 +498,7 @@ class Jelly {
           this.tPos[k + a] += v + (a === 1 ? g : a === 0 ? sway : sway * 0.5);
         }
       }
-      for (let it = 0; it < 3; it++) for (let j = 1; j < T_SEG; j++) this.constrain(this.tPos, base + (j - 1) * 3, base + j * 3, this.tLen[i], j === 1);
+      for (let it = 0; it < this.iters; it++) for (let j = 1; j < this.nS; j++) this.constrain(this.tPos, base + (j - 1) * 3, base + j * 3, this.tLen[i], j === 1);
     }
     // arms
     for (let a = 0; a < ARMS; a++) {
@@ -451,11 +534,11 @@ class Jelly {
     const { r, g, b } = this.color;
     const k0 = alpha * Math.min(1.6, this.glow) * 0.38;
     let o = 0;
-    for (let i = 0; i < TENTACLES; i++) for (let j = 0; j < T_SEG - 1; j++) {
+    for (let i = 0; i < this.nT; i++) for (let j = 0; j < this.nS - 1; j++) {
       for (let e = 0; e < 2; e++) {
-        const src = (i * T_SEG + j + e) * 3;
+        const src = (i * this.nS + j + e) * 3;
         lp[o] = this.tPos[src]; lp[o + 1] = this.tPos[src + 1]; lp[o + 2] = this.tPos[src + 2];
-        const fade = Math.pow(1 - (j + e) / (T_SEG - 1), 1.4) * k0;
+        const fade = Math.pow(1 - (j + e) / (this.nS - 1), 1.4) * k0;
         lc[o] = r * fade; lc[o + 1] = g * fade; lc[o + 2] = b * fade;
         o += 3;
       }
@@ -534,11 +617,18 @@ export class Aquarium {
   light = new THREE.Vector3(0, 0, 0);
   lightTarget = new THREE.Vector3(0, 0, 0);
   pointerActive = false;
+  title: THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial> | null = null;
+  intro = true;
+  lensPass!: ShaderPass;
+  lensTarget = new THREE.Vector2(0.5, 0.5);
+  titleCenter = new THREE.Vector2(0.5, 0.5);
+  lastPointer = -10;
   bursts: { pts: THREE.Points; vel: Float32Array; life: number; center: THREE.Vector3; rate: number; feed: boolean }[] = [];
 
   constructor(public canvas: HTMLCanvasElement) {
     const mobile = window.innerWidth < 760;
-    this.max = mobile ? 8 : 14;
+    // tank capacity: jellies are never removed, adding simply stops when the tank is full
+    this.max = mobile ? 40 : 100;
     this.reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
@@ -577,6 +667,8 @@ export class Aquarium {
     this.composer.addPass(new RenderPass(this.scene, this.camera));
     this.bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), this.reduced ? 0.4 : 0.65, 0.55, 0.12);
     this.composer.addPass(this.bloom);
+    this.lensPass = new ShaderPass(LENS_SHADER);
+    this.composer.addPass(this.lensPass);
     this.composer.addPass(new OutputPass());
 
     this.resize();
@@ -597,7 +689,9 @@ export class Aquarium {
     return { w: h * this.camera.aspect, h };
   };
 
+  /** adds a jelly unless the tank is full; returns false when there is no room */
   spawn(species: Species, size: Size, fromBelow = true) {
+    if (this.jellies.length >= this.max) return false;
     const [a, b] = SIZE_R[size];
     const R = rand(a, b) * (window.innerWidth < 760 ? 0.72 : 1);
     const z = size === 'large' ? rand(-2, 5) : size === 'medium' ? rand(-8, 2) : rand(-18, -4);
@@ -606,9 +700,8 @@ export class Aquarium {
     const j = new Jelly(this.scene, species, R, pos);
     if (fromBelow) j.vel.y = 0.7;
     this.jellies.push(j);
-    const alive = this.jellies.filter((x) => !x.dying);
-    if (alive.length > this.max) alive[0].dying = true;
-    this.onCount?.(this.jellies.filter((x) => !x.dying).length);
+    this.onCount?.(this.jellies.length);
+    return true;
   }
 
   setMode(m: Mode) {
@@ -625,6 +718,8 @@ export class Aquarium {
     const t = (0 - this.camera.position.z) / dir.z;
     this.lightTarget.copy(this.camera.position).addScaledVector(dir, t);
     this.pointerActive = true;
+    this.lensTarget.set(x / window.innerWidth, 1 - y / window.innerHeight);
+    this.lastPointer = this.time;
   }
 
   releasePlankton() {
@@ -683,6 +778,38 @@ export class Aquarium {
     this.bursts.push({ pts, vel, life: 1, center: hit, rate: 1 / 2.5, feed: false });
     return '#' + j.color.getHexString();
   }
+
+  /** draw the intro title in WebGL exactly over the DOM heading (which then becomes transparent) */
+  setTitle(text: string, rect: DOMRect, fontPx: number, fontFamily: string) {
+    const pad = 1.7, dprS = Math.min(window.devicePixelRatio, 2);
+    const cw = Math.ceil(rect.width * 1.2 * dprS), ch = Math.ceil(rect.height * pad * dprS);
+    const cv = document.createElement('canvas'); cv.width = cw; cv.height = ch;
+    const g = cv.getContext('2d')!;
+    g.fillStyle = '#fff'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.font = `300 ${fontPx * dprS}px ${fontFamily}`;
+    g.fillText(text, cw / 2, ch / 2 + fontPx * dprS * 0.04);
+    const tex = new THREE.CanvasTexture(cv); tex.anisotropy = 4;
+    if (!this.title) {
+      const mat = new THREE.ShaderMaterial({ vertexShader: TITLE_VERT, fragmentShader: TITLE_FRAG, transparent: true, depthWrite: false,
+        uniforms: { uMap: { value: tex }, uTime: { value: 0 }, uFade: { value: 1 } } });
+      this.title = new THREE.Mesh(new THREE.PlaneGeometry(1, 1, 48, 12), mat);
+      this.title.renderOrder = 5;
+      this.camera.add(this.title);
+    } else {
+      this.title.material.uniforms.uMap.value.dispose();
+      this.title.material.uniforms.uMap.value = tex;
+    }
+    // place it in camera space at a fixed distance so it stays locked to the DOM layout
+    const D = 22, hh = Math.tan((this.camera.fov * Math.PI) / 360) * D, ww = hh * this.camera.aspect;
+    const W = window.innerWidth, H = window.innerHeight;
+    const cx = rect.left + rect.width / 2, cy = rect.top + rect.height / 2;
+    this.title.position.set((cx / W * 2 - 1) * ww, -(cy / H * 2 - 1) * hh, -D);
+    this.title.scale.set((cw / dprS) / W * 2 * ww, (ch / dprS) / H * 2 * hh, 1);
+    this.titleCenter.set(cx / W, 1 - cy / H);
+    this.lensPass.uniforms.uR.value = Math.min(0.2, Math.max(0.11, (rect.height * 0.62) / H));
+    if (this.lastPointer < 0) this.lensTarget.copy(this.titleCenter);
+  }
+  setIntro(on: boolean) { this.intro = on; }
 
   resize = () => {
     const w = window.innerWidth, h = window.innerHeight;
@@ -764,6 +891,20 @@ export class Aquarium {
     this.jellies = this.jellies.filter((j) => { if (j.dying && j.fade <= 0) { j.dispose(); return false; } return true; });
     if (this.jellies.length !== before) this.onCount?.(this.jellies.filter((x) => !x.dying).length);
 
+    // intro: wobbling title + glass lens (drifts around the title when the pointer is idle)
+    const lu = this.lensPass.uniforms;
+    lu.uOn.value += ((this.intro ? 1 : 0) - lu.uOn.value) * Math.min(1, dt * 2.5);
+    if (this.intro && t - this.lastPointer > 3) {
+      this.lensTarget.set(this.titleCenter.x + Math.sin(t * 0.35) * 0.12, this.titleCenter.y + Math.sin(t * 0.5) * 0.04);
+    }
+    lu.uMouse.value.lerp(this.lensTarget, Math.min(1, dt * 5));
+    lu.uAspect.value = this.camera.aspect; lu.uTime.value = t;
+    if (this.title) {
+      const tm = this.title.material.uniforms;
+      tm.uTime.value = t;
+      tm.uFade.value += ((this.intro ? 1 : 0) - tm.uFade.value) * Math.min(1, dt * 2);
+      this.title.visible = tm.uFade.value > 0.005;
+    }
     this.bg.material.uniforms.uTime.value = t;
     this.snow.material.uniforms.uTime.value = t;
     this.composer.render();

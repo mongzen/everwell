@@ -157,6 +157,7 @@ const FEEL: Record<string, { mode: Mode; track?: TrackId; lead: string }> = {
 
 export default function DriftGame() {
   const canvas = useRef<HTMLCanvasElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
   const aq = useRef<Aquarium | null>(null);
   const [entered, setEntered] = useState(false);
   const [mode, setMode] = useState<Mode | 'add'>('watch');
@@ -180,11 +181,13 @@ export default function DriftGame() {
 
   const enter = () => {
     setEntered(true);
+    aq.current?.setIntro(false);
     if (feel) choose(FEEL[feel].mode);
   };
 
   useEffect(() => {
     let disposed = false;
+    let cleanupTitle = () => {};
     import('./engine').then(({ Aquarium }) => {
       if (disposed || !canvas.current) return;
       try {
@@ -192,9 +195,23 @@ export default function DriftGame() {
         a.onCount = setCount;
         setCount(a.jellies.length);
         aq.current = a;
+        // the intro title is redrawn in WebGL (liquid wobble + glass lens) over the DOM heading
+        const h1 = titleRef.current;
+        if (h1) {
+          const place = () => {
+            const cs = getComputedStyle(h1);
+            a.setTitle(h1.textContent || 'Drift', h1.getBoundingClientRect(), parseFloat(cs.fontSize), cs.fontFamily);
+          };
+          document.fonts.load(`300 100px "Cormorant Garamond"`).catch(() => {}).then(() => {
+            if (disposed) return;
+            place(); h1.classList.add('is-gl');
+            window.addEventListener('resize', place);
+            cleanupTitle = () => window.removeEventListener('resize', place);
+          });
+        }
       } catch { setFailed(true); }
     });
-    return () => { disposed = true; aq.current?.dispose(); aq.current = null; };
+    return () => { disposed = true; cleanupTitle(); aq.current?.dispose(); aq.current = null; };
   }, []);
 
   // feed the music level to the light pulse
@@ -272,7 +289,7 @@ export default function DriftGame() {
   // keep the panel open so people can release several jellies in a row
   const [released, setReleased] = useState(0);
   const release = () => {
-    aq.current?.spawn(species, SIZES[size]);
+    if (!aq.current?.spawn(species, SIZES[size])) return;
     setReleased((n) => n + 1);
   };
   useEffect(() => {
@@ -321,7 +338,7 @@ export default function DriftGame() {
       {/* start */}
       <section className={'drift__intro' + (entered ? ' is-gone' : '')} aria-hidden={entered}>
         <p className="drift__eyebrow">A quiet aquarium</p>
-        <h1 className="drift__title">Drift</h1>
+        <h1 className="drift__title" ref={titleRef}>Drift</h1>
         <p className="drift__lead">{feel ? FEEL[feel].lead : 'Watch jellyfish float through the dark. No goals, no timer — just slow breathing and soft light.'}</p>
         <button type="button" className="drift__btn" onClick={enter}>Enter the tank</button>
         <p className="drift__note">Best with sound on and headphones</p>
@@ -398,9 +415,19 @@ export default function DriftGame() {
               <span className="drift__size-row"><span>Size</span><span>{SIZES[size]}</span></span>
               <input type="range" min={0} max={2} step={1} value={size} onChange={(e) => setSize(+e.target.value)} />
             </label>
-            <button type="button" className="drift__btn jelly-btn" onPointerDown={pop} onClick={release} aria-live="polite">
-              {released ? (released > 1 ? `Released ×${released} — add another?` : 'Released — add another?') : 'Release into the tank'}
-            </button>
+            {(() => {
+              const max = aq.current?.max ?? 30, full = count >= max;
+              return (<>
+                <div className="drift__cap" aria-hidden="true">
+                  <span className="drift__cap-bar"><i style={{ width: `${Math.min(100, (count / max) * 100)}%` }} /></span>
+                  <span>{count} / {max} in the tank</span>
+                </div>
+                <button type="button" className={'drift__btn jelly-btn' + (full ? ' is-full' : '')} onPointerDown={full ? undefined : pop} onClick={release} disabled={full} aria-live="polite">
+                  {full ? 'The tank is full — tap a jelly to say hi'
+                    : released ? (released > 1 ? `Released ×${released} — add another?` : 'Released — add another?') : 'Release into the tank'}
+                </button>
+              </>);
+            })()}
           </aside>
         )}
 
