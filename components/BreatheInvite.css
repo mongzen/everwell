@@ -27,7 +27,7 @@
 .binv__lead{margin:0;font:400 14px/1.6 var(--sans);color:rgba(244,239,230,.6)}
 .binv__q{font:400 18px/1.6 var(--sans);margin:-8px 0 0}
 .binv__answers{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
-.binv__answer{padding:11px 20px;border-radius:999px;border:1px solid rgba(244,239,230,.4);color:var(--cream);text-decoration:none;font:400 14px/1.2 var(--sans);transition:background .3s,color .3s,border-color .3s,transform .3s}
+.binv__answer{padding:11px 20px;border-radius:0;border:1px solid rgba(244,239,230,.4);color:var(--cream);text-decoration:none;font:400 14px/1.2 var(--sans);transition:background .3s,color .3s,border-color .3s,transform .3s}
 .binv__answer:hover,.binv__answer:focus-visible{background:var(--cream);color:var(--forest);border-color:var(--cream);transform:translateY(-1px);outline:none}
 .binv__tag{margin:0;color:rgba(244,239,230,.6)}
 

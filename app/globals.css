@@ -64,9 +64,9 @@ h2{line-height:.98}
 .hero__note{font:400 13px/1.6 var(--sans);letter-spacing:.26px;color:var(--mist);width:500px;max-width:100%}
 .hero__ctas{position:absolute;right:var(--px);bottom:128px;margin:0;display:flex;align-items:center;gap:24px}  /* right edge = nav__cta right edge (both inset by --px) */
 /* sound toggle — bottom-left of the hero, level with the CTAs */
-.sound{position:absolute;left:var(--px);bottom:134px;height:43px;padding:0 16px;display:inline-flex;align-items:center;gap:10px;border:1px solid rgba(244,239,230,.4);border-radius:21.5px;color:var(--cream);background:transparent;cursor:pointer;transition:background .25s,border-color .25s;z-index:2}
-.sound:hover{background:rgba(244,239,230,.1)}
-.sound.is-on{background:rgba(244,239,230,.16)}
+.sound{position:absolute;left:var(--px);bottom:134px;height:43px;padding:0;display:inline-flex;align-items:center;gap:10px;border:0;border-radius:0;color:var(--cream);background:transparent;cursor:pointer;opacity:.8;transition:opacity .25s;z-index:2}
+.sound:hover{opacity:1}
+.sound.is-on{opacity:1}
 .sound:focus-visible{outline:1px solid var(--cream);outline-offset:4px}
 .sound__label{white-space:nowrap;color:inherit}
 .sound__bars{position:relative;width:18px;height:18px;flex:none;display:block}
@@ -169,6 +169,7 @@ h2{line-height:.98}
 .slide--offset{padding-top:96px}
 .card{display:flex;flex-direction:column;gap:20px;width:var(--w)}
 .card__photo{position:relative;width:384px;height:480px;overflow:hidden;flex:none}
+.card__photo--empty{background:var(--sand)}
 .card__cover{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .card__crop{position:absolute;max-width:none}
 .card__info{display:flex;flex-direction:column;gap:8px;overflow:hidden}

@@ -79,7 +79,7 @@ export default function TeamSlider() {
         {TEAM.map((t) => (
           <article className={'slide' + (t.offset ? ' slide--offset' : '')} key={t.name} style={{ ['--w' as string]: `${t.w}px` }}>
             <div className="card">
-              <div className="card__photo">
+              <div className={'card__photo' + ('photo' in t ? '' : ' card__photo--empty')}>
                 {'photo' in t ? (
                   <img className="card__cover" alt={t.name} src={`/images/${t.photo}`} width={768} height={960} />
                 ) : null}

@@ -8,7 +8,7 @@
 
 /* shared type */
 .drift__eyebrow,.drift__sub,.drift__count,.drift__hide,.drift__note,.drift__breath-sub,.drift__hint{font-size:12px;letter-spacing:.14em;text-transform:uppercase}
-.drift__btn{display:inline-flex;align-items:center;justify-content:center;padding:16px 30px;border-radius:999px;border:0;background:#eae3d6;color:#2e2b28;font:500 12px/1 'DM Sans',sans-serif;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:transform .3s,background .3s}
+.drift__btn{display:inline-flex;align-items:center;justify-content:center;padding:16px 30px;border-radius:0;border:0;background:#eae3d6;color:#2e2b28;font:500 12px/1 'DM Sans',sans-serif;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:transform .3s,background .3s}
 .drift__btn:hover{background:#fff;transform:translateY(-1px)}
 .drift button:focus-visible{outline:1px solid #f4efe6;outline-offset:4px}
 
@@ -28,9 +28,9 @@
 .drift__top{position:absolute;top:28px;left:48px;right:48px;display:flex;justify-content:space-between;align-items:flex-start}
 .drift__brand{font:300 36px/1 'Cormorant Garamond',serif;color:inherit;text-decoration:none}
 .drift__sub{margin:8px 0 0;opacity:.55;text-transform:none;letter-spacing:0}
-.drift-sound{height:43px;padding:0 16px;display:inline-flex;align-items:center;gap:10px;border:1px solid rgba(244,239,230,.4);border-radius:22px;background:transparent;color:inherit;font:500 12px/1 'DM Sans',sans-serif;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:background .25s}
-.drift-sound:hover{background:rgba(244,239,230,.1)}
-.drift-sound.is-on{background:rgba(244,239,230,.16)}
+.drift-sound{height:43px;padding:0;display:inline-flex;align-items:center;gap:10px;border:0;border-radius:0;background:transparent;color:inherit;font:500 12px/1 'DM Sans',sans-serif;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;opacity:.8;transition:opacity .25s}
+.drift-sound:hover{opacity:1}
+.drift-sound.is-on{opacity:1}
 .drift-sound.is-on .sound__bars i{animation:eq 1.35s ease-in-out infinite}
 .drift-sound.is-on .sound__bars i:nth-child(1){--a:6px;--b:12px;--c:8px}
 .drift-sound.is-on .sound__bars i:nth-child(2){--a:14px;--b:6px;--c:12px}
@@ -40,8 +40,8 @@
 .drift__count{margin:0;opacity:.5}
 .drift__hide{background:none;border:0;color:inherit;opacity:.5;cursor:pointer;font-family:inherit;padding:8px 0}
 .drift__hide:hover{opacity:.9}
-.drift__modes{position:absolute;left:50%;transform:translateX(-50%);display:flex;gap:4px;padding:6px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px)}
-.drift__modes button{white-space:nowrap;padding:10px 18px;border-radius:999px;border:0;background:transparent;color:inherit;opacity:.6;font:500 11px/1 'DM Sans',sans-serif;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:background .3s,color .3s,opacity .3s}
+.drift__modes{position:absolute;left:50%;transform:translateX(-50%);display:flex;gap:4px;padding:6px;border-radius:0;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px)}
+.drift__modes button{white-space:nowrap;padding:10px 18px;border-radius:0;border:0;background:transparent;color:inherit;opacity:.6;font:500 11px/1 'DM Sans',sans-serif;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:background .3s,color .3s,opacity .3s}
 .drift__modes button:hover{opacity:1}
 .drift__modes button.is-on{background:#eae3d6;color:#2e2b28;opacity:1}
 .drift__hint{position:absolute;left:0;right:0;bottom:120px;text-align:center;opacity:.6;margin:0;text-transform:none;letter-spacing:0;font-size:13px}
@@ -89,11 +89,11 @@
 
 /* music picker */
 .drift__audio{position:relative;display:flex;gap:8px;align-items:center}
-.drift__track{height:43px;padding:0 16px;border-radius:22px;border:1px solid rgba(244,239,230,.18);background:rgba(255,255,255,.04);color:inherit;font:400 13px/1 'DM Sans',sans-serif;cursor:pointer;opacity:.8}
+.drift__track{height:43px;padding:0 16px;border-radius:0;border:1px solid rgba(244,239,230,.18);background:rgba(255,255,255,.04);color:inherit;font:400 13px/1 'DM Sans',sans-serif;cursor:pointer;opacity:.8}
 .drift__track::after{content:'';display:inline-block;width:6px;height:6px;margin-left:10px;border-right:1px solid currentColor;border-bottom:1px solid currentColor;transform:translateY(-3px) rotate(45deg)}
 .drift__track:hover{opacity:1}
 .drift__tracks{position:absolute;right:0;top:54px;width:320px;margin:0;padding:8px;list-style:none;border-radius:20px;background:rgba(10,18,34,.72);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);pointer-events:auto;animation:drift-in .3s ease both}
-.drift__tracks button{width:100%;display:flex;flex-direction:column;gap:3px;padding:10px 12px;border-radius:12px;border:0;background:transparent;color:inherit;text-align:left;cursor:pointer}
+.drift__tracks button{width:100%;display:flex;flex-direction:column;gap:3px;padding:10px 12px;border-radius:0;border:0;background:transparent;color:inherit;text-align:left;cursor:pointer}
 .drift__tracks button:hover{background:rgba(255,255,255,.06)}
 .drift__tracks button.is-sel{background:rgba(150,220,240,.14)}
 .drift__tracks strong{font-weight:500;font-size:14px}
@@ -103,8 +103,8 @@
 /* breathing */
 .drift__breath-count{position:relative;margin:10px 0 0;font:300 22px/1 'Cormorant Garamond',serif;opacity:.6}
 .drift__breath-foot{position:absolute;top:calc(100% + 28px);display:flex;flex-direction:column;align-items:center;gap:14px;width:min(520px,90vw)}
-.drift__patterns{display:flex;gap:6px;padding:5px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);pointer-events:auto}
-.drift__patterns button{padding:9px 14px;border-radius:999px;border:0;background:transparent;color:inherit;opacity:.65;font:500 11px/1 'DM Sans',sans-serif;letter-spacing:.06em;cursor:pointer;white-space:nowrap}
+.drift__patterns{display:flex;gap:6px;padding:5px;border-radius:0;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);pointer-events:auto}
+.drift__patterns button{padding:9px 14px;border-radius:0;border:0;background:transparent;color:inherit;opacity:.65;font:500 11px/1 'DM Sans',sans-serif;letter-spacing:.06em;cursor:pointer;white-space:nowrap}
 .drift__patterns button.is-on{background:#eae3d6;color:#2e2b28;opacity:1}
 .drift__breath-foot .drift__breath-sub{position:static;white-space:normal;text-align:center;text-transform:none;letter-spacing:0;font-size:12px;line-height:1.6;opacity:.55}
 @media (max-width:760px){
@@ -140,7 +140,7 @@
 .drift__modes button.is-on{background:transparent;color:#2e2b28}
 .drift__blob{position:absolute;left:0;top:6px;bottom:6px;pointer-events:none;
   transition:transform .6s cubic-bezier(.34,1.56,.64,1),width .6s cubic-bezier(.34,1.56,.64,1)}
-.drift__blob i{position:absolute;inset:0;border-radius:999px;background:#eae3d6;box-shadow:0 0 24px rgba(234,227,214,.25),inset 0 -2px 6px rgba(46,43,40,.08);animation:jelly .7s .28s cubic-bezier(.3,.7,.4,1) both}
+.drift__blob i{position:absolute;inset:0;border-radius:0;background:#eae3d6;box-shadow:0 0 24px rgba(234,227,214,.25),inset 0 -2px 6px rgba(46,43,40,.08);animation:jelly .7s .28s cubic-bezier(.3,.7,.4,1) both}
 
 /* track button + list */
 .drift__track{transition:transform .12s ease,opacity .3s,background .3s}
