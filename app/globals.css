@@ -135,22 +135,21 @@ h2{line-height:.98}
 .step__desc span{font:500 28px/1.6 var(--sans);letter-spacing:4.48px;text-transform:uppercase;color:var(--charcoal)}
 
 /* team */
-.team{overflow:hidden;padding:192px var(--px);display:flex;flex-direction:column;gap:96px;
+.team{position:relative;overflow:hidden;padding:192px var(--px);display:flex;flex-direction:column;gap:96px;
   background:linear-gradient(159.97deg,var(--cream) 0%,var(--mist) 46.875%,var(--linen) 78.125%)}
 .team__head{max-width:1248px;width:100%;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-end;white-space:nowrap;gap:24px}
 .team__head h2{font-size:96px;letter-spacing:-2.4px;color:var(--charcoal)}
 .team__head .label{color:var(--sage)}
-.slider{display:flex;gap:48px;align-items:flex-start;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;scroll-padding-left:0;
-  /* the design lets the cards bleed past the 1248 column to the viewport edge */
-  margin:0 calc(-1 * var(--px)) 0 0;padding-right:var(--px)}
-.slider::-webkit-scrollbar{display:none}
-.slide{flex:none;width:var(--w);scroll-snap-align:start}
+.slider{overflow:hidden;touch-action:pan-y;margin:0 calc(-1 * var(--px)) 0 0;padding-right:var(--px)}
+.slider:focus-visible{outline:1px dashed var(--sage);outline-offset:8px}
+.slider__rail{display:flex;gap:48px;align-items:flex-start;width:max-content;will-change:transform}
+.team__gl{position:absolute;z-index:2;pointer-events:none;display:block}
+.slide{flex:none;width:var(--w)}
 .slide--offset{padding-top:96px}
 .card{display:flex;flex-direction:column;gap:20px;width:var(--w)}
-.card__photo{position:relative;width:384px;height:480px;background:var(--sand);overflow:hidden;flex:none}
+.card__photo{position:relative;width:384px;height:480px;overflow:hidden;flex:none}
 .card__cover{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .card__crop{position:absolute;max-width:none}
-.card__ph{position:absolute;left:20px;top:444px;font:400 13px/1.6 var(--sans);letter-spacing:.26px;color:var(--muted);white-space:nowrap}
 .card__info{display:flex;flex-direction:column;gap:8px;overflow:hidden}
 .card__info h3{font:400 40px/1.2 var(--serif);white-space:nowrap}
 .card__focus{color:var(--muted);white-space:nowrap}
@@ -160,7 +159,7 @@ h2{line-height:.98}
 .progress__hint{color:var(--charcoal);white-space:nowrap}
 .progress__count{color:var(--muted);white-space:nowrap}
 .progress__rail{flex:1;min-width:1px;height:2px;background:var(--line);overflow:hidden}
-.progress__bar{width:16%;height:100%;background:var(--sage);transition:transform .1s linear}
+.progress__bar{width:16%;height:100%;background:var(--sage)}
 
 /* marquee 1440×294 */
 .marquee{background:var(--forest);padding:72px 0;overflow:hidden}

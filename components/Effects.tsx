@@ -4,3 +4,4 @@ import dynamic from 'next/dynamic';
 export const FlowLines = dynamic(() => import('./FlowLines'), { ssr: false });
 export const Jellyfish = dynamic(() => import('./Jellyfish'), { ssr: false });
 export const GlowField = dynamic(() => import('./GlowField'), { ssr: false });
+export const TeamGL = dynamic(() => import('./TeamGL'), { ssr: false });
