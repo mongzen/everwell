@@ -1,5 +1,6 @@
 import Nav from '@/components/Nav';
 import SupportList from '@/components/SupportList';
+import SupportOutro from '@/components/SupportOutro';
 import TeamSlider from '@/components/TeamSlider';
 import RatesReveal from '@/components/RatesReveal';
 import { FlowLines, Jellyfish, OrganicGradient, GlowField } from '@/components/Effects';
@@ -58,12 +59,7 @@ export default function Home() {
 
         {/* SUPPORT */}
         <section className="support" id="services">
-          <div className="outro">
-            <div className="outro__marquee" aria-hidden="true"><div className="outro__track">{Array.from({ length: 10 }, (_, i) => <span key={i}>Support</span>)}</div></div>
-            <img className="outro__img" src="/images/img_support_center.webp" width="640" height="640" alt="" />
-            <div className="outro__cap"><p>Anxiety · Depression · Trauma · Couples · Grief · Life transitions</p><p className="label">8 AREAS OF CARE</p></div>
-            <blockquote className="outro__quote" aria-hidden="true"><p>“Not sure what to call it? That’s okay. We’ll figure it out together, at your pace.”</p><footer className="label">/ Everwell care team</footer></blockquote>
-          </div>
+          <SupportOutro />
           <div className="slist-wrap">
             <div className="slist-bg"><Jellyfish /></div>
             <div className="slist-layout">
