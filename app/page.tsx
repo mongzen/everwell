@@ -14,8 +14,8 @@ const TRUST = [
 ];
 const STEPS = [
   ['01', 'Tell us a little', 'Share a few details in a short, confidential form. We reply within one business day.', 'img_step_1.webp'],
-  ['02', 'Get matched', 'We pair you with a qualified psychologist whose experience fits what you’re looking for.', 'img_step_2.webp'],
-  ['03', 'Begin when ready', 'Meet on secure video from home. There’s no pressure to have it all figured out.', 'img_step_3.webp'],
+  ['02', 'Get matched', 'We pair you with a qualified psychologist whose experience fits what you're looking for.', 'img_step_2.webp'],
+  ['03', 'Begin when ready', 'Meet on secure video from home. There's no pressure to have it all figured out.', 'img_step_3.webp'],
 ] as const;
 
 export default function Home() {
@@ -67,8 +67,8 @@ export default function Home() {
             <div className="slist-layout">
               <div className="slist-head">
                 <p className="label slist-head__eyebrow">What we support</p>
-                <h2>Support for what you’re carrying.</h2>
-                <p className="lead">Not sure what to call it? That’s okay. We’ll figure it out together, at your pace.</p>
+                <h2>Support for what you're carrying.</h2>
+                <p className="lead">Not sure what to call it? That's okay. We'll figure it out together, at your pace.</p>
               </div>
               <SupportList />
             </div>
@@ -134,13 +134,15 @@ export default function Home() {
           <div className="footer__links">
             <div><h4 className="label">Menu</h4><a href="#psychologists">Psychologists</a><a href="#fees">Service fees</a><a href="#services">Services</a><a href="#contact">Contact us</a></div>
             <div><h4 className="label">Contact us</h4><a href="mailto:hello@everwell.example">hello@everwell.example</a><a href="tel:021234567">02 123 4567</a><span>Mon–Sat · 08:00–20:00 (ICT)</span></div>
+            <div><h4 className="label">Team</h4><a href="mailto:hello@everwell.example">hello@everwell.example</a><a href="#" className="theme-purchase"><span>Buy this theme</span></a></div>
             <div><h4 className="label">Follow</h4>{['Facebook', 'Instagram', 'LINE', 'YouTube'].map((s) => <a key={s} href="#">{s}</a>)}</div>
           </div>
         </div>
-        <p className="footer__crisis">If you are in crisis or need immediate help, call the Department of Mental Health hotline <a href="tel:1323">1323</a> (24 hours) or <a href="tel:1669">1669</a> for medical emergencies. Everwell is not an emergency service.</p>
+        <p className="footer__theme-info">Interested in this design? <a href="mailto:hello@everwell.example" className="theme-contact-btn">Contact us</a> to purchase this theme.</p>
+        <p className="footer__crisis">If you are in crisis or need immediate help, call the Department of Mental Health hotline <a href="tel:1323">1323</a> (24 hours) or <a href="tel:1669">1669</a></p>
         <p className="footer__word" aria-hidden="true">Everwell</p>
         <hr className="footer__rule" />
-        <div className="footer__bottom"><span>© 2026 Everwell Therapy Co., Ltd. · Licence No. [to be added] · Privacy Policy · Terms of Service</span><a className="label" href="#top">Back to top ↑</a></div>
+        <div className="footer__bottom"><span>© 2026 Everwell Therapy Co., Ltd. · Licence No. [to be added] · Privacy Policy · Terms of Service</span><a className="label" href="#top">Back to top</a></div>
       </footer>
     </>
   );
