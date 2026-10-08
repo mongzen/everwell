@@ -138,7 +138,7 @@ export default function Home() {
             <div><h4 className="label">Follow</h4>{['Facebook', 'Instagram', 'LINE', 'YouTube'].map((s) => <a key={s} href="#">{s}</a>)}</div>
           </div>
         </div>
-        <p className="footer__theme-info">Interested in this design? <a href="mailto:hello@everwell.example" className="theme-contact-btn">Contact us</a> to purchase this theme.</p>
+        <p className="footer__theme-info">Interested in this design? <a href="mailto:mongzen.2025@gmail.com" className="theme-contact-btn">Contact us</a> to purchase this theme.</p>
         <p className="footer__crisis">If you are in crisis or need immediate help, call the Department of Mental Health hotline <a href="tel:1323">1323</a> (24 hours) or <a href="tel:1669">1669</a></p>
         <p className="footer__word" aria-hidden="true">Everwell</p>
         <hr className="footer__rule" />
