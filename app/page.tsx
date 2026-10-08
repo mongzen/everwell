@@ -14,8 +14,8 @@ const TRUST = [
 ];
 const STEPS = [
   ['01', 'Tell us a little', 'Share a few details in a short, confidential form. We reply within one business day.', 'img_step_1.webp'],
-  ['02', 'Get matched', 'We pair you with a qualified psychologist whose experience fits what you're looking for.', 'img_step_2.webp'],
-  ['03', 'Begin when ready', 'Meet on secure video from home. There's no pressure to have it all figured out.', 'img_step_3.webp'],
+  ['02', 'Get matched', 'We pair you with a qualified psychologist whose experience fits what you\'re looking for.', 'img_step_2.webp'],
+  ['03', 'Begin when ready', 'Meet on secure video from home. There\'s no pressure to have it all figured out.', 'img_step_3.webp'],
 ] as const;
 
 export default function Home() {
