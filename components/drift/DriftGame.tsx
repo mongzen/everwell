@@ -165,7 +165,8 @@ export default function DriftGame() {
   const [hidden, setHidden] = useState(false);
   const [species, setSpecies] = useState<Species>('moon');
   const [size, setSize] = useState(1);
-  const [breath, setBreath] = useState({ inhale: true, sec: 6, scale: 0.75 });
+  const [breath, setBreath] = useState({ inhale: true, sec: 6 });
+  const ringRef = useRef<HTMLSpanElement>(null);
   const [pattern, setPattern] = useState<'resonance' | 'longExhale'>('resonance');
   const [menu, setMenu] = useState(false);
   const [touchable, setTouchable] = useState(false);
@@ -214,14 +215,6 @@ export default function DriftGame() {
     return () => { disposed = true; cleanupTitle(); aq.current?.dispose(); aq.current = null; };
   }, []);
 
-  // feed the music level to the light pulse
-  useEffect(() => {
-    let raf = 0;
-    const tick = () => { aq.current?.setAudioLevel(sound.level()); raf = requestAnimationFrame(tick); };
-    tick();
-    return () => cancelAnimationFrame(raf);
-  });
-
   // breathing pattern
   useEffect(() => {
     import('./engine').then(({ BREATH_PATTERNS }) => {
@@ -240,7 +233,10 @@ export default function DriftGame() {
       if (a) {
         const b = a.breathState();
         const scale = b.inhale ? 0.72 + 0.28 * ease(b.t) : 1 - 0.28 * ease(b.t);
-        setBreath({ inhale: b.inhale, sec: Math.max(1, Math.ceil(b.remaining)), scale });
+        // the ring is moved straight on the DOM node; React only re-renders when the label/second actually changes
+        if (ringRef.current) ringRef.current.style.transform = `translate(-50%,-50%) scale(${scale})`;
+        const sec = Math.max(1, Math.ceil(b.remaining));
+        setBreath((p) => (p.inhale === b.inhale && p.sec === sec ? p : { inhale: b.inhale, sec }));
       }
       raf = requestAnimationFrame(tick);
     };
@@ -379,7 +375,7 @@ export default function DriftGame() {
         {mode === 'breathe' && (
           <div className="drift__breath" aria-live="polite">
             <span className="drift__ring" />
-            <span className="drift__ring drift__ring--b" style={{ transform: `translate(-50%,-50%) scale(${breath.scale})` }} />
+            <span className="drift__ring drift__ring--b" ref={ringRef} />
             <p className="drift__breath-label">{breath.inhale ? 'Breathe in' : 'Breathe out'}</p>
             <p className="drift__breath-count">{breath.sec}</p>
             <div className="drift__breath-foot">

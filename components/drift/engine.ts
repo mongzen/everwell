@@ -49,6 +49,11 @@ const smooth = (a: number, b: number, x: number) => {
   return t * t * (3 - 2 * t);
 };
 
+// Scratch vectors reused every frame: allocating Vector3s per jelly per frame caused GC pauses (visible stutter).
+const _toGoal = new THREE.Vector3(), _up = new THREE.Vector3(), _heading = new THREE.Vector3(),
+  _anchor = new THREE.Vector3(), _d = new THREE.Vector3(), _p = new THREE.Vector3();
+const Y_AXIS = new THREE.Vector3(0, 1, 0);
+
 /* ---------------------------- shaders ----------------------------- */
 
 const BELL_VERT = /* glsl */ `
@@ -65,7 +70,9 @@ const BELL_VERT = /* glsl */ `
     vec3 p = position;
     float v = clamp((1.0 - p.y) / 1.16, 0.0, 1.0);          // 0 top -> 1 rim
     float squeeze = 1.0 - uC * 0.26 * smoothstep(0.1, 1.0, v) + uFlare * 0.09 * smoothstep(0.55, 1.0, v);
-    float ang = atan(p.z, p.x);
+    vec2 pq = p.xz;
+    if (dot(pq, pq) < 1e-8) pq = vec2(1e-4, 0.0);   // atan(0,0) is undefined -> NaN at the bell's pole
+    float ang = atan(pq.y, pq.x);
     float ripple = 1.0 + (0.02 + uFlare * 0.03) * sin(ang * 8.0 + uTime * 0.6 + uSeed) * smoothstep(0.6, 1.0, v)
                        + 0.012 * sin(ang * 3.0 - uTime * 0.4 + uSeed) * smoothstep(0.3, 1.0, v);
     p.xz *= squeeze * ripple;
@@ -91,8 +98,10 @@ const BELL_FRAG = /* glsl */ `
   varying vec3 vN;
   varying vec3 vView;
   void main(){
-    float fres = pow(1.0 - abs(dot(normalize(vN), normalize(vView))), 2.2);
-    float ang = atan(vObj.z, vObj.x);
+    float fres = pow(clamp(1.0 - abs(dot(normalize(vN), normalize(vView))), 0.0, 1.0), 2.2);   // clamp: rounding can push it below 0 -> pow(neg) = NaN
+    vec2 oq = vObj.xz;
+    if (dot(oq, oq) < 1e-8) oq = vec2(1e-4, 0.0);
+    float ang = atan(oq.y, oq.x);
     float canals = pow(abs(cos(ang * 8.0)), 80.0) * smoothstep(0.08, 0.5, vV) * (1.0 - smoothstep(0.85, 1.0, vV));
     // four horseshoe gonads seen from above
     float gon = 0.0;
@@ -417,11 +426,11 @@ class Jelly {
       this.nextWander = t + rand(18, 34);
     }
     const goal = ctx.light ?? this.wander;
-    const toGoal = goal.clone().sub(pos);
+    const toGoal = _toGoal.copy(goal).sub(pos);
     const dy = toGoal.y;
 
     // stroke strength depends on where it wants to go: strong when the goal is above, light when below
-    const up = new THREE.Vector3(0, 1, 0).applyQuaternion(this.group.quaternion);
+    const up = _up.copy(Y_AXIS).applyQuaternion(this.group.quaternion);
     const thrust = 0.35 + 1.25 * smooth(-4, 3, dy);
     if (dc > 0) this.vel.addScaledVector(up, dc * thrust);
 
@@ -440,7 +449,7 @@ class Jelly {
     this.glowTarget = 1 + ctx.pulse * 0.55 + this.boopGlow;
     if (ctx.light) {
       const dist = toGoal.length();
-      if (dist > 2.5) this.vel.addScaledVector(toGoal.clone().normalize(), 0.08 * dt);
+      if (dist > 2.5) this.vel.addScaledVector(toGoal, (0.08 * dt) / dist);
       this.glowTarget += 1.3 * Math.exp(-dist / 6);
     }
     for (const pk of ctx.plankton) if (pk.distanceTo(pos) < 6) this.glowTarget += 0.9;
@@ -458,11 +467,11 @@ class Jelly {
     pos.addScaledVector(this.vel, dt * 1.2);
 
     // tilt the bell toward the goal (how jellyfish steer), never flipping upside down
-    const heading = toGoal.clone().normalize().multiplyScalar(0.7).add(this.vel.clone().multiplyScalar(0.6));
+    const heading = _heading.copy(toGoal).normalize().multiplyScalar(0.7).addScaledVector(this.vel, 0.6);
     heading.y = Math.max(heading.y, 0) + 0.55;
     heading.x += Math.sin(t * 0.05 + this.seed) * 0.06;
     if (heading.lengthSq() > 1e-4) {
-      this.targetQ.setFromUnitVectors(new THREE.Vector3(0, 1, 0), heading.normalize());
+      this.targetQ.setFromUnitVectors(Y_AXIS, heading.normalize());
       this.group.quaternion.slerp(this.targetQ, Math.min(1, dt * 0.3));
     }
     this.group.updateMatrixWorld();
@@ -480,7 +489,7 @@ class Jelly {
   }
 
   private simulate(t: number, dt: number, alpha: number) {
-    const tmp = new THREE.Vector3();
+    const tmp = _anchor;
     const f = Math.min(dt * 60, 2);
     const damp = Math.pow(0.975, f);
     const g = -0.0005 * this.R * f * f;
@@ -608,6 +617,10 @@ export class Aquarium {
   raf = 0;
   running = true;
   reduced = false;
+  pr = 1;
+  frameEma = 1 / 60;
+  frames = 0;
+  cooldown = 0;
   max: number;
   onCount?: (n: number) => void;
 
@@ -630,8 +643,9 @@ export class Aquarium {
     // tank capacity: jellies are never removed, adding simply stops when the tank is full
     this.max = mobile ? 40 : 100;
     this.reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: 'high-performance' });
+    this.pr = Math.min(window.devicePixelRatio, 1.5);
+    this.renderer.setPixelRatio(this.pr);
     this.renderer.setClearColor(0x02040c, 1);
     this.camera.position.set(0, 0, 30);
 
@@ -744,7 +758,7 @@ export class Aquarium {
     let best: Jelly | null = null, bestZ = -Infinity;
     for (const j of this.jellies) {
       if (j.dying || j.fade < 0.3) continue;
-      const c = j.group.position.clone().project(this.camera);
+      const c = _p.copy(j.group.position).project(this.camera);
       const sx = (c.x + 1) / 2 * w, sy = (1 - c.y) / 2 * h;
       const dist = this.camera.position.distanceTo(j.group.position);
       const rpx = (j.R / (Math.tan((this.camera.fov * Math.PI) / 360) * dist)) * (h / 2);
@@ -823,15 +837,35 @@ export class Aquarium {
     this.bg.material.uniforms.uAspect.value = this.camera.aspect;
   };
 
+  private setRes(pr: number) {
+    this.pr = pr;
+    this.renderer.setPixelRatio(pr);
+    this.composer.setPixelRatio(pr);
+    this.snow.material.uniforms.uPR.value = pr;
+  }
+
+  /** dynamic resolution: if frames keep taking too long, render fewer pixels (never below 0.75x) */
+  private adapt(raw: number) {
+    if (this.frames++ < 90 || raw > 0.25) return; // skip warm-up (shader compile) and tab-switch spikes
+    this.frameEma += (raw - this.frameEma) * 0.06;
+    if (this.cooldown > 0) { this.cooldown--; return; }
+    if (this.frameEma > 0.024 && this.pr > 0.75) {
+      this.setRes(Math.max(0.75, this.pr - 0.25));
+      this.frameEma = 1 / 60; this.cooldown = 120;
+    }
+  }
+
   onVis = () => {
     this.running = !document.hidden;
-    if (this.running) { this.clock.getDelta(); this.loop(); } else cancelAnimationFrame(this.raf);
+    if (this.running) { this.clock.getDelta(); this.frames = 0; this.loop(); } else cancelAnimationFrame(this.raf);
   };
 
   loop = () => {
     if (!this.running) return;
     this.raf = requestAnimationFrame(this.loop);
-    const dt = Math.min(this.clock.getDelta(), 1 / 20) * (this.reduced ? 0.55 : 1);
+    const raw = this.clock.getDelta();
+    this.adapt(raw);
+    const dt = Math.min(raw, 1 / 20) * (this.reduced ? 0.55 : 1);
     this.time += dt;
     const t = this.time;
 
@@ -881,7 +915,7 @@ export class Aquarium {
     // personal space: neighbours drift apart instead of piling up
     for (let i = 0; i < this.jellies.length; i++) for (let k = i + 1; k < this.jellies.length; k++) {
       const A = this.jellies[i], B = this.jellies[k];
-      const d = A.group.position.clone().sub(B.group.position);
+      const d = _d.copy(A.group.position).sub(B.group.position);
       const min = (A.R + B.R) * 1.8, dist = d.length();
       if (dist < min && dist > 1e-3) {
         d.multiplyScalar(((min - dist) / min) * 0.25 * dt / dist);
@@ -896,6 +930,7 @@ export class Aquarium {
     // intro: wobbling title + glass lens (drifts around the title when the pointer is idle)
     const lu = this.lensPass.uniforms;
     lu.uOn.value += ((this.intro ? 1 : 0) - lu.uOn.value) * Math.min(1, dt * 2.5);
+    this.lensPass.enabled = this.intro || lu.uOn.value > 0.002; // skip a full-screen pass once the intro is over
     if (this.intro && t - this.lastPointer > 3) {
       this.lensTarget.set(this.titleCenter.x + Math.sin(t * 0.35) * 0.12, this.titleCenter.y + Math.sin(t * 0.5) * 0.04);
     }

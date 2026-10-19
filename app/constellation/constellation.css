@@ -1,0 +1,144 @@
+/* Constellation — "Constellation — AI Chat" (Figma). Desktop stage 1440×900, mobile stage 390 wide.
+   The .cst__stage is scaled to the viewport so every absolute position below is a design pixel.
+   Everything is square-cornered by design; only stars/glows are round (drawn in WebGL). */
+.cst{position:fixed;inset:0;overflow:hidden;background:linear-gradient(180deg,#0c101c 0%,#1c2032 100%);color:#f4efe6;font-family:'DM Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased;transition:background .8s ease}
+.cst[data-view='safety']{background:linear-gradient(180deg,#121622 0%,#1e242e 100%)}
+.cst button,.cst input,.cst a{font-family:inherit}
+.cst__canvas{position:absolute;inset:0;width:100%;height:100%;display:block;transition:opacity .8s ease}
+.cst[data-view='safety'] .cst__canvas{opacity:0}
+.cst__fail{position:absolute;inset:auto 0 50%;text-align:center;opacity:.7}
+.cst__stage{position:absolute;left:0;top:0;transform-origin:0 0;pointer-events:none}
+.cst[data-view='safety'] .cst__stage{opacity:0;visibility:hidden}
+.cst :focus-visible{outline:1px solid #f4efe6;outline-offset:4px}
+
+/* shared glass surface */
+.cst__glass,.cst__pill,.cst__input,.cst__panel,.cst__card,.cst__insight,.cst__tag,.cst__action{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px);border-radius:0}
+
+/* HUD */
+.cst__hud{position:absolute;left:48px;top:32px;pointer-events:none}
+.cst__brand{display:block;font:300 30px/36px 'Cormorant Garamond',serif;color:#f4efe6;pointer-events:auto}
+.cst__meta{margin:4px 0 0;font-size:12px;line-height:16px;color:rgba(244,239,230,.6)}
+
+/* constellation captions */
+.cst__label{position:absolute;opacity:0;pointer-events:none;white-space:nowrap;transition:left .9s ease,top .9s ease,opacity .7s ease}
+.cst__label.is-on{opacity:1}
+.cst__label-title{margin:0;font:300 24px/32px 'Cormorant Garamond',serif;color:rgba(244,239,230,var(--ta,1));transition:color .7s ease}
+.cst__label-sub{margin:0;font-size:11px;line-height:14px;letter-spacing:1.32px;text-transform:uppercase;color:rgba(244,239,230,var(--sa,.55));transition:color .7s ease}
+
+/* ---------- welcome ---------- */
+.cst__welcome{position:absolute;left:400px;top:330px;width:640px;display:flex;flex-direction:column;align-items:center;gap:22px;opacity:0;visibility:hidden;transform:translateY(40px);transition:opacity .8s ease,transform .8s ease,visibility .8s}
+.cst__welcome.is-on{opacity:1;visibility:visible;transform:none;pointer-events:auto}
+.cst__eyebrow{margin:0;font-size:11px;font-weight:500;letter-spacing:1.76px;text-transform:uppercase;color:#ffe2aa}
+.cst__title{margin:0;font:300 68px/1 'Cormorant Garamond',serif;text-align:center;color:#f4efe6}
+.cst__lede{margin:0;font-size:16px;line-height:1.65;text-align:center;color:rgba(244,239,230,.7)}
+.cst__disclaimer{margin:0;font-size:11px;line-height:1.6;text-align:center;color:rgba(244,239,230,.5)}
+.cst__starters{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+
+.cst__input{width:100%;display:flex;align-items:center;gap:8px;padding:6px 6px 6px 22px;background:rgba(255,255,255,.08);transition:border-color .2s,background .2s}
+.cst__input:focus-within{border-color:rgba(255,226,170,.5);background:rgba(255,255,255,.1)}
+.cst__input input{flex:1;min-width:0;background:none;border:0;outline:0;font-size:15px;color:#f4efe6}
+.cst__input input::placeholder{color:rgba(244,239,230,.55)}
+.cst__input--chat{padding-left:18px}
+.cst__input--chat input{font-size:14px}
+
+.cst__btn{border:0;border-radius:0;cursor:pointer;white-space:nowrap;background:#eae3d6;color:#2e2b28;padding:13px 20px;font-size:12px;font-weight:500;line-height:normal;letter-spacing:1.44px;text-transform:uppercase;text-decoration:none;transition:transform .15s ease,box-shadow .2s ease}
+.cst__btn:hover{transform:translateY(-1px);box-shadow:0 0 24px rgba(255,226,170,.3)}
+.cst__btn--s{padding:12px 18px}
+.cst__btn--talk{position:absolute;left:48px;top:820px;padding:14px 22px;pointer-events:none}
+
+.cst__pill{cursor:pointer;padding:8px 14px;font-size:12px;font-weight:500;line-height:normal;color:#f4efe6;text-decoration:none;display:inline-flex;align-items:center;transition:background .2s,border-color .2s}
+.cst__pill:hover{background:rgba(255,255,255,.12);border-color:rgba(255,226,170,.4)}
+.cst__pill[data-on]{background:rgba(255,226,170,.14);border-color:rgba(255,226,170,.5)}
+.cst__pill--s{padding:7px 12px;font-size:11px}
+.cst__pill--c{padding:8px 12px;font-size:11px;letter-spacing:1.32px;text-transform:uppercase}
+.cst__pill--r{padding:12px 18px;font-size:12px;letter-spacing:1.44px;text-transform:uppercase}
+.cst__pill--sky{position:absolute;left:313px;top:26px;padding:8px 14px;font-size:11px;letter-spacing:1.32px;text-transform:uppercase;pointer-events:none}
+
+/* ---------- views (conversation / sky) ---------- */
+.cst__view{position:absolute;inset:0;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .7s ease,visibility .7s}
+.cst__view.is-on{opacity:1;visibility:visible}
+.cst__view.is-on>*,.cst__view.is-on .cst__panel>*{pointer-events:auto}
+.cst__view.is-on .cst__btn--talk{pointer-events:auto}
+.cst__view.is-on .cst__pill--sky{pointer-events:auto}
+
+/* chat panel */
+.cst__panel{position:absolute;left:48px;top:120px;width:440px;height:740px;padding:22px 22px 18px;display:flex;flex-direction:column;gap:14px;overflow:hidden}
+.cst__panel-head{display:flex;align-items:center;justify-content:space-between}
+.cst__wren{margin:0;font:300 28px/normal 'Cormorant Garamond',serif;color:#f4efe6}
+.cst__sub{margin:2px 0 0;font-size:12px;line-height:normal;color:rgba(244,239,230,.6)}
+.cst__tag{padding:6px 10px;font-size:10px;font-weight:500;letter-spacing:1.2px;text-transform:uppercase;white-space:nowrap}
+.cst__rule{height:1px;flex:none;background:rgba(255,255,255,.12)}
+.cst__msgs{flex:1;min-height:0;display:flex;flex-direction:column;gap:12px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.18) transparent}
+.cst__row{display:flex;flex:none}
+.cst__row.is-you{justify-content:flex-end}
+.cst__bubble{margin:0;width:300px;padding:12px 16px;font-size:14px;line-height:1.5;overflow-wrap:anywhere}
+.cst__bubble.is-wren{background:rgba(255,255,255,.08);color:#f4efe6}
+.cst__bubble.is-you{background:#eae3d6;color:#2e2b28}
+.cst__sys{flex:none;padding:10px 14px;font-size:12px;font-weight:500;color:#ffe2aa;background:rgba(255,226,170,.08);border:1px dashed rgba(255,226,170,.35)}
+.cst__modes{display:flex;gap:8px;flex:none}
+.cst__send{flex:none;width:40px;height:40px;border:0;border-radius:0;background:#eae3d6;color:#2e2b28;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:box-shadow .2s}
+.cst__send:hover{box-shadow:0 0 18px rgba(255,226,170,.35)}
+.cst__crisis{flex:none;align-self:flex-start;border:0;background:none;padding:0;cursor:pointer;font-size:11px;font-weight:500;color:#ffe2aa;text-align:left}
+.cst__crisis:hover{text-decoration:underline;text-underline-offset:3px}
+
+.cst__controls{position:absolute;left:1099px;top:32px;display:flex;gap:8px}
+.cst__card{position:absolute;left:1150px;top:190px;width:260px;padding:16px 18px;display:flex;flex-direction:column;gap:6px;background:rgba(255,255,255,.08);animation:cst-in .8s ease both}
+.cst__card-eyebrow{margin:0;font-size:10px;font-weight:500;letter-spacing:1.4px;text-transform:uppercase;color:#ffe2aa}
+.cst__card-quote{margin:0;font:300 22px/1.1 'Cormorant Garamond',serif;color:#f4efe6;overflow-wrap:anywhere}
+.cst__card-sub{margin:0;font-size:12px;color:rgba(244,239,230,.6)}
+@keyframes cst-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* sky overview */
+.cst__insight{position:absolute;left:48px;top:150px;width:400px;padding:28px;display:flex;flex-direction:column;gap:14px;align-items:flex-start;background:rgba(255,255,255,.07)}
+.cst__insight-eyebrow{margin:0;font-size:11px;font-weight:500;letter-spacing:1.54px;text-transform:uppercase;color:#ffe2aa}
+.cst__insight-title{margin:0;width:100%;font:300 40px/1.2 'Cormorant Garamond',serif;color:#f4efe6}
+.cst__rename{width:100%;background:none;border:0;border-bottom:1px solid rgba(255,226,170,.5);outline:0;padding:0;font:300 40px/1.2 'Cormorant Garamond',serif;color:#f4efe6;border-radius:0}
+.cst__insight-body{margin:0;font-size:14px;line-height:1.6;color:rgba(244,239,230,.75)}
+.cst__insight-note{margin:0;font-size:12px;color:rgba(244,239,230,.5)}
+.cst__insight-quote{margin:0;font:300 26px/1.1 'Cormorant Garamond',serif;color:#f4efe6}
+.cst__actions{display:flex;gap:8px}
+
+.cst__timeline{position:absolute;left:560px;top:810px;width:720px;height:60px}
+.cst__track{position:absolute;left:0;top:0;width:100%;height:25px;cursor:pointer;touch-action:none}
+.cst__track::before{content:'';position:absolute;left:0;right:0;top:12px;height:1px;background:rgba(255,255,255,.25)}
+.cst__handle{position:absolute;top:4px;width:16px;height:16px;border-radius:50%;background:#eae3d6;transform:translateX(-50%);box-shadow:0 0 14px rgba(255,226,170,.45)}
+.cst__month{position:absolute;top:26px;font-size:11px;line-height:14px;letter-spacing:1.54px;text-transform:uppercase;color:rgba(244,239,230,.55);pointer-events:none}
+.cst__timeline,.cst__btn--talk{pointer-events:none}
+.cst__view.is-on .cst__timeline{pointer-events:auto}
+
+/* ---------- safety mode ---------- */
+.cst__safety{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;padding:24px;overflow-y:auto;background:linear-gradient(180deg,#121622 0%,#1e242e 100%);opacity:0;visibility:hidden;transition:opacity .8s ease,visibility .8s}
+.cst__safety.is-on{opacity:1;visibility:visible}
+.cst__calm{position:fixed;left:50%;top:calc(50% - 50px);width:1080px;height:1080px;max-width:160vw;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(150,184,160,.16) 0%,rgba(150,184,160,0) 62%);pointer-events:none}
+.cst__safe{position:relative;width:min(620px,100%);display:flex;flex-direction:column;gap:20px;margin:auto}
+.cst__safe-eyebrow{margin:0;font-size:11px;font-weight:500;letter-spacing:1.76px;text-transform:uppercase;color:#ffe2aa}
+.cst__safe-title{margin:0;font:300 clamp(38px,5vw,56px)/1 'Cormorant Garamond',serif;color:#f4efe6}
+.cst__safe-body{margin:0;font-size:17px;line-height:1.65;color:rgba(244,239,230,.75)}
+.cst__action{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 24px;color:#f4efe6;text-decoration:none;font-size:18px;line-height:normal;transition:background .2s,border-color .2s}
+.cst__action:hover{background:rgba(255,255,255,.12);border-color:rgba(255,226,170,.4)}
+.cst__action strong{display:block;font-size:17px;font-weight:500}
+.cst__action small{display:block;margin-top:2px;font-size:13px;color:rgba(244,239,230,.7)}
+.cst__action.is-primary{background:#eae3d6;border-color:#eae3d6;color:#2e2b28}
+.cst__action.is-primary small{color:rgba(46,43,40,.7)}
+.cst__action.is-primary:hover{background:#fff}
+.cst__safe-back{align-self:flex-start;border:0;background:none;padding:0;cursor:pointer;font-size:14px;font-weight:500;color:#96b8a0}
+.cst__safe-back:hover{text-decoration:underline;text-underline-offset:4px}
+
+/* ---------- mobile (390-wide stage) ---------- */
+.cst--m .cst__hud{left:24px;top:24px}
+.cst--m .cst__brand{font-size:24px;line-height:32px}
+.cst--m .cst__meta{margin-top:0}
+.cst--m .cst__welcome{left:24px;top:240px;width:342px;gap:18px}
+.cst--m .cst__title{font-size:40px}
+.cst--m .cst__lede{font-size:15px}
+.cst--m .cst__input{padding-left:16px}
+.cst--m .cst__input input{font-size:14px}
+.cst--m .cst__btn{padding:13px 14px;letter-spacing:1px}
+.cst--m .cst__panel{left:0;top:324px;bottom:0;width:390px;height:auto}
+.cst--m .cst__bubble{width:270px}
+.cst--m .cst__insight{left:24px;top:auto;bottom:20px;width:342px;padding:24px;gap:12px;background:rgba(255,255,255,.08)}
+
+@media (prefers-reduced-motion:reduce){
+  .cst,.cst__canvas,.cst__label,.cst__welcome,.cst__view,.cst__safety{transition:none}
+  .cst__card{animation:none}
+}
